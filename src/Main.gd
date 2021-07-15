@@ -10,6 +10,10 @@ onready var myu : Node = preload("res://src/MyUtilities.tscn").instance()
 
 
 func _ready() -> void:
+	## Randomize the seed for Godot's random number generator.
+	randomize()
+
+	## Say hello
 	myu.log_to_stdout(filename, "Enter scene tree")
 
 	## Dark black background
@@ -29,9 +33,6 @@ func _ready() -> void:
 	## Use Placeholder to push KeyPress to screen bottom
 	Placeholder.editor_only = false
 	Placeholder.size_flags_vertical = SIZE_EXPAND_FILL
-
-	## Add child that holds all lines for easy free
-	add_child(global_lines)
 
 	print_tree()
 
@@ -65,21 +66,20 @@ func _process(_delta) -> void:
 	global_lines = Node2D.new()
 	add_child(global_lines)
 
-	var line1 : Line2D
-	var line2 : Line2D
+	var lines : Array = []
+	for i in range(2):
+		lines.append(new_line())
+		global_lines.add_child(lines[i])
+		lines[i].default_color = Color8(
+			randi()%0xFF+0x80, # red
+			randi()%0x80, # green
+			randi()%0xFF+0x80  # blue
+			)
+		for _point in range(4):
+			lines[i].add_point(Vector2(randi()%142+100,randi()%42+100))
 
-	line1 = Line2D.new()
-	line1.default_color = Color8(0x80,0x80,0xCC)
-	line1.width = 1
-	global_lines.add_child(line1)
-	line2 = Line2D.new()
-	line2.default_color = Color8(0xCC,0x80,0xCC)
-	line2.width = 1
-	global_lines.add_child(line2)
 
-	## Draw new points
-	line1.add_point(Vector2(randi()%142+100,randi()%42+100))
-	line1.add_point(Vector2(randi()%142+200,randi()%42+200))
-	line2.add_point(Vector2(randi()%142+100,randi()%42+100))
-	line2.add_point(Vector2(randi()%142+200,randi()%42+200))
-
+func new_line() -> Line2D:
+	var line = Line2D.new()
+	line.width = 2
+	return line

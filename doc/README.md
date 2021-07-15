@@ -221,22 +221,15 @@ Tree.
 ```GDScript
 # Main.gd
 
-
 onready var global_lines := Node2D.new() # Parent node to hold all lines
-
-
-func _ready() -> void:
-
-    ## Add child that holds all lines for easy free
-    add_child(global_lines)
 ```
 
 The lines are children of `global_lines`. All children are freed
 when I free `global_lines`. After I free, I have to make a new
-instance and add it to the scene tree again, so why bother adding
-it to the scene tree in `_ready()`? The only reason to add this
-to the scene tree in `_ready()` is so that `_process()` has
-something to free, kicking off the free-then-create cycle.
+instance and add it to the scene tree again, so why bother
+initialzing it? Every iteration of the `_process()` loop does a
+free-then-create, so `_process()` needs something to free the
+first time round.
 
 Free lines and create new lines in `_process()`:
 
@@ -276,6 +269,41 @@ func _process(_delta) -> void:
 ```
 
 The code above draws a pair of blue and purple dancing lines.
+
+To show this approach scales up, make the number of lines and the
+number of points variable:
+
+```GDScript
+# Main.gd
+
+## Testing I can draw lines
+func _process(_delta) -> void:
+
+	## Free all lines
+	global_lines.free()
+
+	## Make new lines
+	global_lines = Node2D.new()
+	add_child(global_lines)
+
+	var lines : Array = []
+	for i in range(2):
+		lines.append(new_line())
+		global_lines.add_child(lines[i])
+		lines[i].default_color = Color8(
+			randi()%0xFF+0x80, # red
+			randi()%0x80, # green
+			randi()%0xFF+0x80  # blue
+			)
+		for _point in range(4):
+			lines[i].add_point(Vector2(randi()%142+100,randi()%42+100))
+
+
+func new_line() -> Line2D:
+	var line = Line2D.new()
+	line.width = 1
+	return line
+```
 
 The lines are drawn to specific screen coordinates. They are not
 clipped and they do not reposition or rescale as the window
