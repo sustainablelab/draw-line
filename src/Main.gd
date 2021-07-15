@@ -1,11 +1,12 @@
-extends VBoxContainer
+extends MarginContainer
 
 
 onready var global_lines := Node2D.new() # Parent node to hold all lines
 
-onready var KeyPress = get_node("KeyPress")
-onready var Placeholder = get_node("PlotArea/Placeholder")
-onready var PlotArea = get_node("PlotArea")
+onready var App:         VBoxContainer   = get_node("App")
+onready var PlotArea:    MarginContainer = get_node("App/PlotArea")
+onready var Placeholder: ReferenceRect   = get_node("App/PlotArea/Placeholder")
+onready var KeyPress:    Label           = get_node("App/KeyPress")
 
 onready var myu : Node = preload("res://src/MyUtilities.tscn").instance()
 
@@ -37,7 +38,17 @@ func _ready() -> void:
 	## Use Placeholder to visualize PlotArea
 	Placeholder.editor_only = false
 
+	# ---< DEBUG >---
+	# Print the final Scene Tree
 	print_tree()
+	# Report new sizes and positions AFTER containers do their work
+	myu.report_size_and_position(self)
+	var _ret # throwaway value returned by connect()
+	_ret = App.connect("resized",         self, "_on_App_resized")
+	_ret = PlotArea.connect("resized",    self, "_on_PlotArea_resized")
+	_ret = Placeholder.connect("resized", self, "_on_Placeholder_resized")
+	_ret = KeyPress.connect("resized",    self, "_on_KeyPress_resized")
+
 
 func _input(event) -> void:
 	if event is InputEventKey:
@@ -67,7 +78,7 @@ func _process(_delta) -> void:
 
 	## Make new lines
 	global_lines = Node2D.new()
-	add_child(global_lines)
+	PlotArea.add_child(global_lines)
 
 	var lines : Array = []
 	for i in range(2):
@@ -86,3 +97,13 @@ func new_line() -> Line2D:
 	var line = Line2D.new()
 	line.width = 2
 	return line
+
+
+func _on_App_resized():
+	myu.report_size_and_position(App)
+func _on_PlotArea_resized():
+	myu.report_size_and_position(PlotArea)
+func _on_Placeholder_resized():
+	myu.report_size_and_position(Placeholder)
+func _on_KeyPress_resized():
+	myu.report_size_and_position(KeyPress)

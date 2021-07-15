@@ -4,18 +4,27 @@
 [ext_resource path="res://src/KeyPress.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/debug_theme.tres" type="Theme" id=3]
 
-[node name="Main" type="VBoxContainer"]
+[node name="Main" type="MarginContainer"]
 theme = ExtResource( 3 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PlotArea" type="MarginContainer" parent="."]
+[node name="App" type="VBoxContainer" parent="."]
+margin_bottom = 22.0
 
-[node name="Placeholder" type="ReferenceRect" parent="PlotArea"]
+[node name="PlotArea" type="MarginContainer" parent="App"]
 
-[node name="KeyPress" parent="." instance=ExtResource( 2 )]
+[node name="Placeholder" type="ReferenceRect" parent="App/PlotArea"]
+
+[node name="KeyPress" parent="App" instance=ExtResource( 2 )]
 margin_top = 4.0
 margin_bottom = 18.0
 size_flags_vertical = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+margin_bottom = 22.0
+text = "RichTextLabel
+Line1
+Line2"

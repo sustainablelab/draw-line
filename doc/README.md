@@ -310,6 +310,8 @@ clipped and they do not reposition or rescale as the window
 resizes. Next I address all of that, making the line drawings
 act like they are part of the GUI.
 
+## Mark the drawing area
+
 First, I want to temporarily mark off the drawing area as a
 drawing area. I call it `PlotArea`. I don't know which container
 type to use yet, for now I use `MarginContainer`.
@@ -343,11 +345,16 @@ func _ready() -> void:
 
 There's no obvious changes. Though now, if I wanted to, I can
 erase the `Placeholder` node and my `KeyPress` is still where I
-want it on screen. Now `Placeholder` is just showing me the
+want it on screen. `Placeholder` is just showing me the extents
+of the drawing area; `PlotArea` is what defines the actual
 drawing area.
 
 Of course, my lines have no way of knowing I only want them in
-the drawing area.
+the drawing area. Making `global_lines` a child of `PlotArea`
+will at least take care of translating the lines, but whether
+`global_lines` is a child of `PlotArea` or a child of `Main`
+makes no difference at the moment because `PlotArea` and `Main`
+have the same (0,0) origin in global coordinates.
 
 To make line drawings act like they are part of the GUI, I need
 to distinguish between *data space* and *pixel space*. I create
@@ -358,9 +365,113 @@ The easiest way to explore this coordinate transform is to put
 the mouse coordinates in a HUD, displaying the coordinates at
 each step of the transform.
 
-Create a HUD to display mouse coordinates:
+I want to create a HUD to display mouse coordinates. First, I
+need to rethink the Scene Tree for adding the HUD.
+
+## Setup Scene Tree for a text overlay
+
+TLDR: Make a MarginContainer node above the VBoxContainer.
+
+The HUD is a transparent overlay of text information.
+
+To make it *overlay* the screen, change the `Main` node to a
+`MarginContainer`, create a child-node named `App`. Make `App`
+the `VBoxContainer`. Move the existing nodes into `App`:
+
+```print_tree
+.   <-------------- Main is now a MarginContainer
+App      <--------- App is the new VBoxContainer
+App/PlotArea      <--------- Make this a child of App
+App/PlotArea/Placeholder <-- Make this a child of App
+App/KeyPress      <--------- Make this a child of App
+CanvasLayer
+CanvasLayer/ColorRect
+```
+
+Crucially, the new `VBoxContainer` does not need a script or any
+manual changes in the Godot Inspector.
+
+Most previous work stay the same:
+
+- Remember the `CanvasLayer` that sets the background color? This
+  node type is not affected by containers, so it is OK to
+  continue as-is: `Main.gd` still makes `CanvasLayer` and
+  `CanvasLayer/ColorRect` children of `Main`.
+- Remember it is critical for `Main` to have its `anchor_right =
+  ANCHOR_END` and `anchor_bottom = ANCHOR_END` so that the
+  `VBoxContainer` fills the window and resizes when the window
+  resizes? This is still true. `Main` is a `MarginContainer` now,
+  but it still has the responsibility of setting anchors to fill
+  the window.
 
 
+```GDScript
+# Main.gd
+
+onready var App:         VBoxContainer   = get_node("App")
+onready var PlotArea:    MarginContainer = get_node("App/PlotArea")
+onready var Placeholder: ReferenceRect   = get_node("App/PlotArea/Placeholder")
+onready var KeyPress:    Label           = get_node("App/KeyPress")
+```
+
+And here is the `_ready()`, just to show that everything else
+really did stay the same:
+
+```GDScript
+# Main.gd
+
+func _ready() -> void:
+	## Randomize the seed for Godot's random number generator.
+	randomize()
+
+	## Say hello
+	myu.log_to_stdout(filename, "Enter scene tree")
+
+	## Dark black background
+	var bgnd_layer := CanvasLayer.new()
+	bgnd_layer.layer = -1
+	var bgnd_color := ColorRect.new()
+	bgnd_color.anchor_right = ANCHOR_END
+	bgnd_color.anchor_bottom = ANCHOR_END
+	bgnd_color.color = Color8(0x14,0x14,0x13)
+	bgnd_layer.add_child(bgnd_color, true)
+	add_child(bgnd_layer, true)
+
+	## Make this application fill the window and auto-resize
+	anchor_right = ANCHOR_END
+	anchor_bottom = ANCHOR_END
+
+	## Use PlotArea to push KeyPress to screen bottom
+	PlotArea.size_flags_vertical = SIZE_EXPAND_FILL
+
+	## Use Placeholder to visualize PlotArea
+	Placeholder.editor_only = false
+```
+
+If I attempt to add text *without* making this change to the
+Scene Tree, the text does not overlay and instead the container
+puts it in a "horizontal box" on the screen.
+
+The results of this depend on the class of the text node. The
+container does not autosize space for the `RichTextLabel` class,
+so the result is a thin gap shows up but no text is visible. The
+`TextEdit` class is the opposite -- it occupies all the available
+space.
+
+So whichever text class I pick, the HUD text CANNOT be a child of
+the VBoxContainer.
+
+## Overlay text
+
+Create a `RichTextLabel` node named `HUD` and make it a child of
+`Main`. It does not matter if it is before or after `App` in the
+Scene Tree.
+
+Experimenting with `RichTextLabel` and `TextEdit`, it seems
+`RichTextLabel` overlays without changing the background color
+while `TextEdit` lightens my dark background. The `TextEdit`
+class is so complicated that I can't figure out which color
+affects the background.
 
 # Scrap paper
 
