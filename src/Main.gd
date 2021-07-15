@@ -1,6 +1,10 @@
 extends MarginContainer
 
 
+# ---< DEVELOPER >---
+onready var Hud: Label = get_node("HUD")
+
+# ---< APPLICATION USER >---
 onready var global_lines := Node2D.new() # Parent node to hold all lines
 
 onready var App:         VBoxContainer   = get_node("App")
@@ -8,6 +12,7 @@ onready var PlotArea:    MarginContainer = get_node("App/PlotArea")
 onready var Placeholder: ReferenceRect   = get_node("App/PlotArea/Placeholder")
 onready var KeyPress:    Label           = get_node("App/KeyPress")
 
+# ---< LIBRARIES >---
 onready var myu : Node = preload("res://src/MyUtilities.tscn").instance()
 
 
@@ -42,13 +47,13 @@ func _ready() -> void:
 	# Print the final Scene Tree
 	print_tree()
 	# Report new sizes and positions AFTER containers do their work
-	myu.report_size_and_position(self)
 	var _ret # throwaway value returned by connect()
+	_ret = connect("resized", self, "_on_resized")
 	_ret = App.connect("resized",         self, "_on_App_resized")
 	_ret = PlotArea.connect("resized",    self, "_on_PlotArea_resized")
 	_ret = Placeholder.connect("resized", self, "_on_Placeholder_resized")
 	_ret = KeyPress.connect("resized",    self, "_on_KeyPress_resized")
-
+	_ret = Hud.connect("resized",         self, "_on_Hud_resized")
 
 func _input(event) -> void:
 	if event is InputEventKey:
@@ -99,6 +104,8 @@ func new_line() -> Line2D:
 	return line
 
 
+func _on_resized():
+	myu.report_size_and_position(self)
 func _on_App_resized():
 	myu.report_size_and_position(App)
 func _on_PlotArea_resized():
@@ -107,3 +114,5 @@ func _on_Placeholder_resized():
 	myu.report_size_and_position(Placeholder)
 func _on_KeyPress_resized():
 	myu.report_size_and_position(KeyPress)
+func _on_Hud_resized():
+	myu.report_size_and_position(Hud)

@@ -461,17 +461,117 @@ space.
 So whichever text class I pick, the HUD text CANNOT be a child of
 the VBoxContainer.
 
+## Use resized signal to find out positions and sizes
+
+Before I add the text overlay, I set up for reporting position
+and size of all the nodes that occupy a place on the screen.
+Checking size and position is another way to troubleshoot layout
+mysteries. 
+
+The container nodes resize and reposition their contents.
+So checking size in the `_ready()` callback is useless. The only
+way to know the actual size is to report it after a `resized`
+signal is emitted.
+
+This signal is emitted when the application starts, even if I
+don't resize the window with my mouse, because Godot has to
+resize the window when the application starts.
+
+The initial ridiculous zero-width and zero-height sizes are
+changed by the containers, and the signal `resized` is emitted by
+each affected node.
+
+The setup is simple. Since `resized` is a built-in signal, I
+don't need to add it to any of the nodes, they are already
+emitting this signal. I just need to connect it to a function in
+`Main.gd` that prints the size and position to stdout.
+
+```GDScript
+# Main.gd
+
+func _ready() -> void:
+
+	# ---< DEBUG >---
+	# Print the final Scene Tree
+	print_tree()
+	# Report new sizes and positions AFTER containers do their work
+	var _ret # throwaway value returned by connect()
+	_ret = connect("resized", self, "_on_resized")
+	_ret = App.connect("resized",         self, "_on_App_resized")
+	_ret = PlotArea.connect("resized",    self, "_on_PlotArea_resized")
+	_ret = Placeholder.connect("resized", self, "_on_Placeholder_resized")
+	_ret = KeyPress.connect("resized",    self, "_on_KeyPress_resized")
+
+
+func _on_resized():
+	myu.report_size_and_position(self)
+func _on_App_resized():
+	myu.report_size_and_position(App)
+func _on_PlotArea_resized():
+	myu.report_size_and_position(PlotArea)
+func _on_Placeholder_resized():
+	myu.report_size_and_position(Placeholder)
+func _on_KeyPress_resized():
+	myu.report_size_and_position(KeyPress)
+```
+
+Here is the utility function to print the size and position
+message:
+
+```GDScript
+# MyUtilities.gd
+
+## \brief Print the size and position of a Control Node to stdout
+##
+## Example: "@LOG(res://src/Main.tscn): Main size:(800, 300) position: (0, 0)"
+##
+## \param control: The Control node to report on.
+func report_size_and_position(control : Control) -> void:
+
+	## Get the name of this control node
+	var path = NodePath(control.get_path())
+	var name : String = path.get_name(path.get_name_count()-1)
+
+	## Get the global size and position of this control node
+	var rect = control.get_global_rect()
+
+	### Report its size and position
+	var size: String
+	var pos:  String
+	var msg:  String
+
+	size = String(rect.size)
+	pos = String(rect.position)
+	msg = "{n} size:{s} position: {p}".format({"n":name,"s":size,"p":pos})
+	log_to_stdout(filename, msg)
+```
+
+
+
 ## Overlay text
 
-Create a `RichTextLabel` node named `HUD` and make it a child of
+Create a `Label` node named `HUD` and make it a child of
 `Main`. It does not matter if it is before or after `App` in the
 Scene Tree.
 
-Experimenting with `RichTextLabel` and `TextEdit`, it seems
-`RichTextLabel` overlays without changing the background color
-while `TextEdit` lightens my dark background. The `TextEdit`
-class is so complicated that I can't figure out which color
-affects the background.
+Experimenting with `Label`, `RichTextLabel`, and `TextEdit`, it
+seems `Label` and `RichTextLabel` overlay without changing the
+background color while `TextEdit` lightens my dark background.
+The `TextEdit` class is so complicated that I can't figure out
+which color affects the background.
+
+By default, `Label` centers vertically and starts at the left
+edge of the screen. I want my overlay text centered at the top of
+the screen. Fix this with a script attached to `HUD`:
+
+```GDScript
+# HUD.gd
+
+func _ready():
+    align = Label.ALIGN_CENTER
+    valign = Label.VALIGN_TOP
+    size_flags_vertical = Label.SIZE_EXPAND
+```
 
 # Scrap paper
 

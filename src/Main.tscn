@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://src/Main.gd" type="Script" id=1]
 [ext_resource path="res://src/KeyPress.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/debug_theme.tres" type="Theme" id=3]
+[ext_resource path="res://src/HUD.gd" type="Script" id=4]
 
 [node name="Main" type="MarginContainer"]
 theme = ExtResource( 3 )
@@ -11,20 +12,27 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="HUD" type="Label" parent="."]
+margin_right = 88.0
+margin_bottom = 48.0
+size_flags_vertical = 0
+text = "Label
+Line1
+Line2"
+script = ExtResource( 4 )
+
 [node name="App" type="VBoxContainer" parent="."]
-margin_bottom = 22.0
+margin_right = 88.0
+margin_bottom = 48.0
 
 [node name="PlotArea" type="MarginContainer" parent="App"]
+margin_right = 88.0
 
 [node name="Placeholder" type="ReferenceRect" parent="App/PlotArea"]
+margin_right = 88.0
 
 [node name="KeyPress" parent="App" instance=ExtResource( 2 )]
 margin_top = 4.0
+margin_right = 88.0
 margin_bottom = 18.0
 size_flags_vertical = 1
-
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
-margin_bottom = 22.0
-text = "RichTextLabel
-Line1
-Line2"
