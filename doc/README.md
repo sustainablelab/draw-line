@@ -310,6 +310,58 @@ clipped and they do not reposition or rescale as the window
 resizes. Next I address all of that, making the line drawings
 act like they are part of the GUI.
 
+First, I want to temporarily mark off the drawing area as a
+drawing area. I call it `PlotArea`. I don't know which container
+type to use yet, for now I use `MarginContainer`.
+
+```print_tree
+.
+PlotArea
+PlotArea/Placeholder
+KeyPress
+CanvasLayer
+CanvasLayer/ColorRect
+```
+
+And with this new Node, the code shows my intent a little better:
+
+```GDScript
+# Main.gd
+
+
+onready var Placeholder = get_node("PlotArea/Placeholder")
+onready var PlotArea = get_node("PlotArea")
+
+func _ready() -> void:
+
+    ## Use PlotArea to push KeyPress to screen bottom
+    PlotArea.size_flags_vertical = SIZE_EXPAND_FILL
+
+    ## Use Placeholder to visualize PlotArea
+    Placeholder.editor_only = false
+```
+
+There's no obvious changes. Though now, if I wanted to, I can
+erase the `Placeholder` node and my `KeyPress` is still where I
+want it on screen. Now `Placeholder` is just showing me the
+drawing area.
+
+Of course, my lines have no way of knowing I only want them in
+the drawing area.
+
+To make line drawings act like they are part of the GUI, I need
+to distinguish between *data space* and *pixel space*. I create
+lines in data space and I draw them in pixel space. This is a
+coordinate transform.
+
+The easiest way to explore this coordinate transform is to put
+the mouse coordinates in a HUD, displaying the coordinates at
+each step of the transform.
+
+Create a HUD to display mouse coordinates:
+
+
+
 # Scrap paper
 
 **Scene Tree** for `plot-gui`:

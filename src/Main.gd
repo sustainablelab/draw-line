@@ -4,7 +4,8 @@ extends VBoxContainer
 onready var global_lines := Node2D.new() # Parent node to hold all lines
 
 onready var KeyPress = get_node("KeyPress")
-onready var Placeholder = get_node("Placeholder")
+onready var Placeholder = get_node("PlotArea/Placeholder")
+onready var PlotArea = get_node("PlotArea")
 
 onready var myu : Node = preload("res://src/MyUtilities.tscn").instance()
 
@@ -30,9 +31,11 @@ func _ready() -> void:
 	anchor_right = ANCHOR_END
 	anchor_bottom = ANCHOR_END
 
-	## Use Placeholder to push KeyPress to screen bottom
+	## Use PlotArea to push KeyPress to screen bottom
+	PlotArea.size_flags_vertical = SIZE_EXPAND_FILL
+
+	## Use Placeholder to visualize PlotArea
 	Placeholder.editor_only = false
-	Placeholder.size_flags_vertical = SIZE_EXPAND_FILL
 
 	print_tree()
 
@@ -76,7 +79,7 @@ func _process(_delta) -> void:
 			randi()%0xFF+0x80  # blue
 			)
 		for _point in range(4):
-			lines[i].add_point(Vector2(randi()%142+100,randi()%42+100))
+			lines[i].add_point(Vector2(randi()%242+100,randi()%142+100))
 
 
 func new_line() -> Line2D:
