@@ -25,10 +25,11 @@ onready var HudRight: Label         = get_node("Dev/HudRight")
 ## **Free** and **remake** plot artwork on every iteration of
 ## `_process()`.
 ##
-## Add lines (Line2D nodes) as children of Node `global_lines` to
-## simplify memory management. Free `global_lines` to free all
-## plot lines.
-onready var global_lines := Node2D.new() # Parent node to hold all lines
+## Add lines (Line2D nodes) as children of `_art` Nodes to
+## simplify memory management. Free `_art` to free all Line2D
+## artwork.
+onready var global_data_art := Node2D.new() # Parent node to hold all data Line2D nodes
+onready var global_grid_art := Node2D.new() # Parent node to hold all grid Line2D nodes
 
 # ---< Scene Tree >---
 onready var App:          VBoxContainer   = get_node("App")
@@ -210,30 +211,21 @@ func _process(_delta) -> void:
 	## Draw lines.
 
 	# Free all lines
-	global_lines.free()
+	global_data_art.free()
+	global_grid_art.free()
 
 	# Create base memory for lines
-	global_lines = Node2D.new()
-	Data_area.add_child(global_lines)
+	global_data_art = Node2D.new()
+	global_grid_art = Node2D.new()
+	Data_area.add_child(global_data_art)
+	Data_area.add_child(global_grid_art)
 
-	# Make the lines
-	var lines : Array = []
-	for i in range(2):
-		## Make a new line.
-		lines.append(new_line())
-		global_lines.add_child(lines[i])
-		## Randomize its color.
-		lines[i].default_color = Color8(
-			randi()%0xFF+0x80, # red
-			randi()%0x80, # green
-			randi()%0xFF+0x80  # blue
-			)
-		## Randomize the points in the line.
-		for _point in range(4):
-			lines[i].add_point( Vector2(
-				randi()%int(Data_area.rect_size.x),
-				randi()%int(Data_area.rect_size.y)
-				))
+	## Make the grid line artwork.
+	make_grid_lines()
+
+	## Make the data and the data line artwork.
+	make_data_lines()
+
 
 
 ##
@@ -242,6 +234,23 @@ func _process(_delta) -> void:
 func new_line() -> Line2D:
 	var line = Line2D.new()
 	line.width = 5
+	return line
+
+
+##
+## \brief Create a grid line
+##
+func new_grid_line() -> Line2D:
+	var line = Line2D.new()
+	## Make grid lines skinny.
+	line.width = 1
+	## Make grid lines dark green and transparent.
+	line.default_color = Color8(
+		0x40, # red
+		0x80, # green
+		0x40, # blue
+		0x80  # alpha
+		)
 	return line
 
 
@@ -302,6 +311,77 @@ func keypress_F3() -> void:
 # ------------------
 # | Draw functions |
 # ------------------
+
+##
+## \brief Make the grid line artwork
+##
+func make_grid_lines() -> void:
+	var x_divisions : Array = []
+	var y_divisions : Array = []
+	var n_xticks := 10 # TEMP
+	var n_yticks := 10 # TEMP
+	# Name top-left corner of data area (xO,yO)
+	var xO : float = 0 # Data_area.rect_position.x
+	var yO : float = 0 # Data_area.rect_position.y
+	var axis_size := Vector2( # TEMP
+		Data_area.rect_size.x,
+		Data_area.rect_size.y
+		)
+	# tick pitch (screen space between ticks)
+	var xtick_pitch : float = axis_size.x/(n_xticks-1)
+	var ytick_pitch : float = axis_size.y/(n_yticks-1)
+	# X divisions start 5 pixels below `XAxis` and go to top of `Data_area`
+	var ystart : float = -5
+	var ystop : float = axis_size.y
+	# Y divisions start 5 pixels left of `YAxis` and go to right end of `Data_area`
+	var xstart : float = -5
+	var xstop : float = axis_size.x
+	# Make X divisions
+	for i in range(n_xticks):
+		## Make a new line.
+		x_divisions.append(new_grid_line())
+		global_grid_art.add_child(x_divisions[i])
+		## Draw a line for each tick on the XAxis.
+		# Describe x-location of grid line in Grid coordinates
+		var xG : float = i*xtick_pitch
+		# Draw points in Data_area (pixel) coordinates
+		x_divisions[i].add_point(Vector2(xO + xG, (yO - ystart) + axis_size.y))
+		x_divisions[i].add_point(Vector2(xO + xG, (yO - ystop)  + axis_size.y))
+	# Make Y divisions
+	for i in range(n_yticks):
+		## Make a new line.
+		y_divisions.append(new_grid_line())
+		global_grid_art.add_child(y_divisions[i])
+		## Draw a line for each tick on the XAxis.
+		# Describe y-location of grid line in Grid coordinates
+		var yG : float = i*ytick_pitch
+		# Draw points in Data_area (pixel) coordinates
+		y_divisions[i].add_point(Vector2(xO + xstart, yO + yG))
+		y_divisions[i].add_point(Vector2(xO + xstop, yO + yG))
+
+
+##
+## \brief Make the data and the data line artwork
+##
+func make_data_lines() -> void:
+	var lines : Array = []
+	for i in range(2):
+		## Make a new line.
+		lines.append(new_line())
+		global_data_art.add_child(lines[i])
+		## Randomize its color.
+		lines[i].default_color = Color8(
+			randi()%0xFF+0x80, # red
+			randi()%0x80, # green
+			randi()%0xFF+0x80  # blue
+			)
+		## Randomize the points in the line.
+		for _point in range(4):
+			lines[i].add_point( Vector2(
+				randi()%int(Data_area.rect_size.x),
+				randi()%int(Data_area.rect_size.y)
+				))
+
 
 ##
 ## \brief Display mouse coordinates in HudRight

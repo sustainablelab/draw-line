@@ -2,7 +2,7 @@
 
    type |  GDScript file  | nlines | details
 ------- | --------------- | ------ | -------
- script |         Main.gd |    370 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
+ script |         Main.gd |    371 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
  script |  MyUtilities.gd |     52 | extends Node
  script |      HudLeft.gd |     25 | extends Label
  script |     KeyPress.gd |     15 | extends Label
@@ -11,22 +11,22 @@
 
 ## Summary
 
-    Main.gd: 370 lines
+    Main.gd: 371 lines
 
 Read Main.gd by starting at the `_ready()` callback on line
-58.
+59.
 
 All drawing happens in the `_process()` callback on line
-201.
+202.
 
 ## Table of Contents
 
 - [4 : Globals](Main.md#globals)
-- [52 : Setup](Main.md#setup)
-- [195 : Draw](Main.md#draw)
-- [249 : User Input](Main.md#user-input)
-- [278 : KeyPress Functions](Main.md#keypress-functions)
-- [303 : Draw functions](Main.md#draw-functions)
+- [53 : Setup](Main.md#setup)
+- [196 : Draw](Main.md#draw)
+- [250 : User Input](Main.md#user-input)
+- [279 : KeyPress Functions](Main.md#keypress-functions)
+- [304 : Draw functions](Main.md#draw-functions)
 
 ## Globals
 ### Libraries
@@ -44,9 +44,9 @@ function:
 **Free** and **remake** plot artwork on every iteration of
 `_process()`.
 
-Add lines (Line2D nodes) as children of Node `global_lines` to
-simplify memory management. Free `global_lines` to free all
-plot lines.
+Add lines (Line2D nodes) as children of `_art` Nodes to
+simplify memory management. Free `_art` to free all Line2D
+artwork.
 #### Scene Tree
     App
     App/Plot_area
@@ -67,7 +67,7 @@ plot lines.
 
 \brief Application Setup
 
-    58 : func _ready() -> void:
+    59 : func _ready() -> void:
 Randomize the seed for Godot's random number generator.
 Say hello.
 
@@ -126,7 +126,7 @@ Use Y1Axis_bound to visualize space for the Y1 axis
 
 \brief Application Loop
 
-    201 : func _process(_delta) -> void:
+    202 : func _process(_delta) -> void:
 Write text to HUD text overlay.
 Title the plot.
 Draw lines.
@@ -136,12 +136,12 @@ Randomize the points in the line.
 
 \brief Create a line with default width
 
-    242 : func new_line() -> Line2D:
+    243 : func new_line() -> Line2D:
 ## User Input
 
 \brief Handle keyboard input
 
-    255 : func _input(event) -> void:
+    256 : func _input(event) -> void:
 Esc quits.
 F2 toggles HUD text overlay.
 F3 toggles bounding boxes.
@@ -149,19 +149,19 @@ F3 toggles bounding boxes.
 
 \brief Quit when user presses Esc
 
-    284 : func keypress_esc() -> void:
+    285 : func keypress_esc() -> void:
 
 \brief Toggle bounding boxes when user presses F3
 
-    292 : func keypress_F3() -> void:
+    293 : func keypress_F3() -> void:
 ## Draw functions
 
 \brief Display mouse coordinates in HudRight
 
-    309 : func HudRight_write_text() -> void:
+    310 : func HudRight_write_text() -> void:
 
 \brief Report size and position of Nodes in HudLeft
 
-    324 : func HudLeft_write_text() -> void:
+    325 : func HudLeft_write_text() -> void:
 
 bob
