@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://src/Main.gd" type="Script" id=1]
 [ext_resource path="res://src/KeyPress.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/debug_theme.tres" type="Theme" id=3]
 [ext_resource path="res://src/HudLeft.gd" type="Script" id=4]
 [ext_resource path="res://src/HudRight.gd" type="Script" id=5]
+[ext_resource path="res://assets/hud.stylebox" type="StyleBox" id=6]
 
 [node name="Main" type="MarginContainer"]
 theme = ExtResource( 3 )
@@ -13,34 +14,66 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="App" type="VBoxContainer" parent="."]
+margin_right = 4.0
+margin_bottom = 56.0
+
+[node name="PlotArea" type="MarginContainer" parent="App"]
+margin_right = 4.0
+margin_bottom = 36.0
+
+[node name="PlotArea_bound" type="ReferenceRect" parent="App/PlotArea"]
+margin_right = 4.0
+margin_bottom = 36.0
+
+[node name="PlotParts" type="GridContainer" parent="App/PlotArea"]
+margin_right = 4.0
+margin_bottom = 36.0
+
+[node name="UpLeft_bound" type="ReferenceRect" parent="App/PlotArea/PlotParts"]
+
+[node name="Title" type="Label" parent="App/PlotArea/PlotParts"]
+margin_top = 4.0
+margin_bottom = 20.0
+
+[node name="Y1Axis_bound" type="ReferenceRect" parent="App/PlotArea/PlotParts"]
+margin_top = 24.0
+margin_bottom = 24.0
+
+[node name="Data" type="MarginContainer" parent="App/PlotArea/PlotParts"]
+margin_top = 28.0
+margin_bottom = 28.0
+
+[node name="Data_bound" type="ReferenceRect" parent="App/PlotArea/PlotParts/Data"]
+
+[node name="Origin_bound" type="ReferenceRect" parent="App/PlotArea/PlotParts"]
+margin_top = 32.0
+margin_bottom = 32.0
+
+[node name="XAxis_bound" type="ReferenceRect" parent="App/PlotArea/PlotParts"]
+margin_top = 36.0
+margin_bottom = 36.0
+
+[node name="KeyPress" parent="App" instance=ExtResource( 2 )]
+margin_top = 40.0
+margin_right = 4.0
+margin_bottom = 56.0
+size_flags_vertical = 1
+
 [node name="Dev" type="HBoxContainer" parent="."]
 margin_right = 4.0
-margin_bottom = 20.0
+margin_bottom = 56.0
 
 [node name="HudLeft" type="Label" parent="Dev"]
 margin_bottom = 16.0
 size_flags_vertical = 0
+custom_styles/normal = ExtResource( 6 )
 script = ExtResource( 4 )
 
 [node name="HudRight" type="Label" parent="Dev"]
 margin_left = 4.0
-margin_top = 2.0
+margin_top = 20.0
 margin_right = 4.0
-margin_bottom = 18.0
+margin_bottom = 36.0
+custom_styles/normal = ExtResource( 6 )
 script = ExtResource( 5 )
-
-[node name="App" type="VBoxContainer" parent="."]
-margin_right = 4.0
-margin_bottom = 20.0
-
-[node name="PlotArea" type="MarginContainer" parent="App"]
-margin_right = 4.0
-
-[node name="Placeholder" type="ReferenceRect" parent="App/PlotArea"]
-margin_right = 4.0
-
-[node name="KeyPress" parent="App" instance=ExtResource( 2 )]
-margin_top = 4.0
-margin_right = 4.0
-margin_bottom = 20.0
-size_flags_vertical = 1

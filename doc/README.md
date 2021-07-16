@@ -305,10 +305,16 @@ func new_line() -> Line2D:
 	return line
 ```
 
+## But the lines are not part of the GUI yet
+
 The lines are drawn to specific screen coordinates. They are not
-clipped and they do not reposition or rescale as the window
-resizes. Next I address all of that, making the line drawings
-act like they are part of the GUI.
+clipped, they do not reposition, they do not rescale as the
+window resizes, and I cannot interact with them, zooming and
+panning with the mouse. Next I address all of that, making the
+line drawings act like they are part of the GUI.
+
+First, I need to add development tools to the application to get
+away from printing to stdout.
 
 ## Mark the drawing area
 
@@ -546,8 +552,6 @@ func report_size_and_position(control : Control) -> void:
 	log_to_stdout(filename, msg)
 ```
 
-
-
 ## Overlay text
 
 Create a `Label` node named `HUD` and make it a child of
@@ -568,10 +572,156 @@ the screen. Fix this with a script attached to `HUD`:
 # HUD.gd
 
 func _ready():
-    align = Label.ALIGN_CENTER
     valign = Label.VALIGN_TOP
+    size_flags_horizontal = Label.SIZE_SHRINK_CENTER
     size_flags_vertical = Label.SIZE_EXPAND
 ```
+
+There are automated ways to set up monitoring values in the text
+overlay. For now I am keeping it simple, manually adding
+information and doing basic formatting for a clean presentation.
+
+I make a `String` variable for each Node I want to monitor. I
+put these in the `HUD.gd` script to make the variable naming
+straight-forward and obvious.
+
+## Use a Left and Right HUD
+
+I already know I want to monitor Nodes and I want to monitor the
+mouse coordinates in different coordinate spaces. For now, I'll
+set it up as a HudLeft and HudRight. Make an `HBoxContainer`
+named `Dev` a child node of `Main` and make the `HudLeft` and
+`HudRight` labels child nodes of `Dev`.
+
+```GDScript
+# Main.gd
+
+# ---< DEVELOPER >---
+onready var HudLeft: Label = get_node("Dev/HudLeft")
+onready var HudRight: Label = get_node("Dev/HudRight")
+```
+
+And I make string variables for the strings in each HUD.
+
+Node info in the left HUD:
+
+```GDScript
+# HudLeft.gd
+
+extends Label
+
+
+var Main:        String
+var App:         String
+var PlotArea:    String
+var Placeholder: String
+var KeyPress:    String
+var Hud:         String
+
+
+func _ready():
+    valign = Label.VALIGN_TOP
+    size_flags_horizontal = Label.SIZE_SHRINK_CENTER
+    size_flags_vertical = Label.SIZE_EXPAND
+```
+
+Coordinate info in the right HUD:
+
+```GDScript
+# HudRight.gd
+
+extends Label
+
+
+var Mouse : String
+
+func _ready():
+    valign = Label.VALIGN_TOP
+    size_flags_horizontal = Label.SIZE_SHRINK_CENTER
+    size_flags_vertical = Label.SIZE_EXPAND
+```
+
+There is no longer any reason to use the `resized` signals. The
+signal was useful before because I only wanted to print to stdout
+when something changed. Now I have the text updating live in the
+HUD, so I simply grab these values and update the text every
+frame, whether the values changed or not.
+
+```GDScript
+# Main.gd
+
+func _process(_delta) -> void:
+
+	## Write text to HUD text overlay
+	## Write values in HudLeft text overlay
+	HudLeft.Main = myu.report_size_and_position(self)
+	HudLeft.App = myu.report_size_and_position(App)
+	HudLeft.PlotArea = myu.report_size_and_position(PlotArea)
+	HudLeft.Placeholder = myu.report_size_and_position(Placeholder)
+	HudLeft.KeyPress = myu.report_size_and_position(KeyPress)
+	HudLeft.Hud = myu.report_size_and_position(HudLeft)
+	HudLeft.text = "{Main}\n{App}\n{PlotArea}\n{Placeholder}\n{KeyPress}\n{HudLeft}".format({
+		"Main":HudLeft.Main,
+		"App":HudLeft.App,
+		"PlotArea":HudLeft.PlotArea,
+		"Placeholder":HudLeft.Placeholder,
+		"KeyPress":HudLeft.KeyPress,
+		"HudLeft":HudLeft.Hud
+		})
+	## Write values in HudRight text overlay
+	HudRight.Mouse = get_global_mouse_position()
+	HudRight.text = "GLOBAL MOUSE: {Mouse}".format({
+		"Mouse":HudRight.Mouse
+		})
+```
+
+The above code block eliminates all the signal connections to
+`resized` and all of the `_on_resized()` calls.
+
+I also change the `report_size_and_position()` utility function
+to return a `String` instead of printing to stdout. And now that
+the text is on the screen, I format the strings to form a sort of
+table. It's a simple automation that pads spaces between the
+variable strings, as long as none of the strings exceed 12
+characters.
+
+```GDScript
+# MyUtilities.gd
+
+## \brief Report the size and position of a Control Node
+##
+## Example: "NODE: Main    SIZE: (800, 300)    POSITION: (0, 0)"
+##
+## \param control: The Control node to report on.
+##
+## \return String for display in the HUD text overlay
+func report_size_and_position(control : Control) -> String:
+
+	## Get the name of this control node
+	var path = NodePath(control.get_path())
+	var name : String = path.get_name(path.get_name_count()-1)
+
+	## Get the global size and position of this control node
+	var rect = control.get_global_rect()
+
+	### Report its size and position
+	var size: String
+	var pos:  String
+	var msg:  String
+
+	size = String(rect.size)
+	pos = String(rect.position)
+	msg = "NODE: {n}{gap1}SIZE: {s}{gap2}POSITION: {p}{gap3}".format({
+		"n":name,
+		"gap1":" ".repeat(13 - name.length()),
+		"s":size,
+		"gap2":" ".repeat(13 - size.length()),
+		"p":pos,
+		"gap3":" ".repeat(13 - pos.length())
+		})
+	return msg
+```
+
 
 # Scrap paper
 

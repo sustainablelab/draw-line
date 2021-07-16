@@ -16,7 +16,7 @@ func log_to_stdout(scene : String, msg : String) -> void:
 
 ## \brief Report the size and position of a Control Node
 ##
-## Example: "node: Main    size: (800, 300)    position: (0, 0)"
+## Example: "NODE: Main    SIZE: (800, 300)    POSITION: (0, 0)"
 ##
 ## \param control: The Control node to report on.
 ##
@@ -39,11 +39,10 @@ func report_size_and_position(control : Control) -> String:
 	pos = String(rect.position)
 	msg = "NODE: {n}{gap1}SIZE: {s}{gap2}POSITION: {p}{gap3}".format({
 		"n":name,
-		"gap1":" ".repeat(13 - name.length()),
+		"gap1":" ".repeat(15 - name.length()),
 		"s":size,
 		"gap2":" ".repeat(13 - size.length()),
 		"p":pos,
 		"gap3":" ".repeat(13 - pos.length())
 		})
-	# log_to_stdout(filename, msg)
 	return msg
