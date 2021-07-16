@@ -2,7 +2,8 @@ extends MarginContainer
 
 
 # ---< DEVELOPER >---
-onready var Hud: Label = get_node("HUD")
+onready var HudLeft: Label = get_node("Dev/HudLeft")
+onready var HudRight: Label = get_node("Dev/HudRight")
 
 # ---< APPLICATION USER >---
 onready var global_lines := Node2D.new() # Parent node to hold all lines
@@ -71,20 +72,25 @@ func keypress_esc() -> void:
 func _process(_delta) -> void:
 
 	## Write text to HUD text overlay
-	## Initialize values in Hud text overlay
-	Hud.Main = myu.report_size_and_position(self)
-	Hud.App = myu.report_size_and_position(App)
-	Hud.PlotArea = myu.report_size_and_position(PlotArea)
-	Hud.Placeholder = myu.report_size_and_position(Placeholder)
-	Hud.KeyPress = myu.report_size_and_position(KeyPress)
-	Hud.Hud = myu.report_size_and_position(Hud)
-	Hud.text = "{Main}\n{App}\n{PlotArea}\n{Placeholder}\n{KeyPress}\n{Hud}".format({
-		"Main":Hud.Main,
-		"App":Hud.App,
-		"PlotArea":Hud.PlotArea,
-		"Placeholder":Hud.Placeholder,
-		"KeyPress":Hud.KeyPress,
-		"Hud":Hud.Hud
+	## Write values in HudLeft text overlay
+	HudLeft.Main = myu.report_size_and_position(self)
+	HudLeft.App = myu.report_size_and_position(App)
+	HudLeft.PlotArea = myu.report_size_and_position(PlotArea)
+	HudLeft.Placeholder = myu.report_size_and_position(Placeholder)
+	HudLeft.KeyPress = myu.report_size_and_position(KeyPress)
+	HudLeft.Hud = myu.report_size_and_position(HudLeft)
+	HudLeft.text = "{Main}\n{App}\n{PlotArea}\n{Placeholder}\n{KeyPress}\n{HudLeft}".format({
+		"Main":HudLeft.Main,
+		"App":HudLeft.App,
+		"PlotArea":HudLeft.PlotArea,
+		"Placeholder":HudLeft.Placeholder,
+		"KeyPress":HudLeft.KeyPress,
+		"HudLeft":HudLeft.Hud
+		})
+	## Write values in HudRight text overlay
+	HudRight.Mouse = get_global_mouse_position()
+	HudRight.text = "GLOBAL MOUSE: {Mouse}".format({
+		"Mouse":HudRight.Mouse
 		})
 
 	## Free all lines
