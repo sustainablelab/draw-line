@@ -1,21 +1,20 @@
 extends Label
 
 
-var Main:           String
-var App:            String
-var PlotArea:       String
-var PlotArea_bound: String
-var PlotParts:      String
-var UpLeft_bound:   String
-var Title:          String
-var Y1Axis_bound:   String
-var Data:           String
-var Data_bound:     String
-var Origin_bound:   String
-var XAxis_bound:    String
-var KeyPress:       String
-var HudLeft:        String
-var HudRight:       String
+var Main:         String
+var App:          String
+var Plot_area:    String
+var PlotParts:    String
+var UpLeft_area:  String
+var Title_area:   String
+var Title:        String
+var Y1Axis_bound: String
+var Data_area:    String
+var Origin_bound: String
+var XAxis_bound:  String
+var KeyPress:     String
+var HudLeft:      String
+var HudRight:     String
 
 
 func _ready():

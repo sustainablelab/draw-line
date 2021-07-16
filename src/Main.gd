@@ -31,18 +31,21 @@ onready var HudRight: Label         = get_node("Dev/HudRight")
 onready var global_lines := Node2D.new() # Parent node to hold all lines
 
 # ---< Scene Tree >---
-onready var App:            VBoxContainer   = get_node("App")
-onready var PlotArea:       MarginContainer = get_node("App/PlotArea")
-onready var PlotArea_bound: ReferenceRect   = get_node("App/PlotArea/PlotArea_bound")
-onready var PlotParts:      GridContainer   = get_node("App/PlotArea/PlotParts")
-onready var UpLeft_bound:   ReferenceRect   = get_node("App/PlotArea/PlotParts/UpLeft_bound")
-onready var Title:          Label           = get_node("App/PlotArea/PlotParts/TitleArea/Title")
-onready var Y1Axis_bound:   ReferenceRect   = get_node("App/PlotArea/PlotParts/Y1Axis_bound")
-onready var Data:           MarginContainer = get_node("App/PlotArea/PlotParts/Data")
-onready var Data_bound:     ReferenceRect   = get_node("App/PlotArea/PlotParts/Data/Data_bound")
-onready var XAxis_bound:    ReferenceRect   = get_node("App/PlotArea/PlotParts/XAxis_bound")
-onready var Origin_bound:	ReferenceRect   = get_node("App/PlotArea/PlotParts/Origin_bound")
-onready var KeyPress:       Label           = get_node("App/KeyPress")
+onready var App:          VBoxContainer   = get_node("App")
+onready var Plot_area:    MarginContainer = get_node("App/Plot_area")
+onready var Plot_bound:   ReferenceRect   = get_node("App/Plot_area/Plot_bound")
+onready var PlotParts:    GridContainer   = get_node("App/Plot_area/PlotParts")
+onready var UpLeft_area:  MarginContainer = get_node("App/Plot_area/PlotParts/UpLeft_area")
+onready var UpLeft_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/UpLeft_area/UpLeft_bound")
+onready var Title_area:   MarginContainer = get_node("App/Plot_area/PlotParts/Title_area")
+onready var Title:        Label           = get_node("App/Plot_area/PlotParts/Title_area/Title")
+onready var Title_bound:  ReferenceRect   = get_node("App/Plot_area/PlotParts/Title_area/Title_bound")
+onready var Y1Axis_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Y1Axis_bound")
+onready var Data_area:    MarginContainer = get_node("App/Plot_area/PlotParts/Data_area")
+onready var Data_bound:   ReferenceRect   = get_node("App/Plot_area/PlotParts/Data_area/Data_bound")
+onready var XAxis_bound:  ReferenceRect   = get_node("App/Plot_area/PlotParts/XAxis_bound")
+onready var Origin_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Origin_bound")
+onready var KeyPress:     Label           = get_node("App/KeyPress")
 
 
 # ---------------
@@ -88,7 +91,7 @@ func _ready() -> void:
 	## **Node App**
 	##
 
-	## `App` divides the screen into two rows: `PlotArea` and
+	## `App` divides the screen into two rows: `Plot_area` and
 	## `KeyPress`.
 
 	##
@@ -96,16 +99,16 @@ func _ready() -> void:
 	##
 
 	##
-	## **Node PlotArea**
+	## **Node Plot_area**
 	##
 
-	## `PlotArea` expands and fills vertically, pushing `KeyPress`
-	## to the screen bottom.
-	PlotArea.size_flags_vertical = SIZE_EXPAND_FILL
+	## `Plot_area` shall expand and fill vertically. Intent is to
+	## push `KeyPress` to the screen bottom.
+	Plot_area.size_flags_vertical = SIZE_EXPAND_FILL
 
-	## `PlotArea_bound` shows the bounds of `PlotArea`.
-	PlotArea_bound.editor_only = false
-	PlotArea_bound.border_color = Color8(0xFF, 0x80, 0x80, 0x80)
+	## `Plot_bound` shows the bounds of `Plot_area`.
+	Plot_bound.editor_only = false
+	Plot_bound.border_color = Color8(0xFF, 0x80, 0x80, 0x80)
 
 	##
 	## **Node PlotParts**
@@ -118,59 +121,66 @@ func _ready() -> void:
 	# Rows in GridContainer PlotParts is num children / columns 
 	PlotParts.columns = 2
 
-	## - `UpLeft_bound` shows the dead space in the upper-left
-	## corner of the plot area.
 	##
-	## - `Title` is the plot title, above the data.
+	## **Children of `PlotParts`**
 	##
-	## - `Y1Axis_bound` shows the space for the Y-axis to the
-	## left of the data.
+	## - *UpLeft*: dead space in the upper-left corner of the plot area
 	##
-	## - `Data_bound` shows the space for the plot lines.
+	## - *Title*: plot title above the data
 	##
-	## - `XAxis_bound` shows the space for the X-axis.
+	## - *Y1Axis*: the Y-axis to the left of the data
 	##
-	## - `Origin_bound` shows the dead space in the lower-left
-	## corner of the plot area.
+	## - *Data*: draw plot lines here
+	##
+	## - *Origin*: dead space in the lower-left corner of the plot area
+	##
+	## - *XAxis*: the X-axis
 
 	##
-	## **Node Data**
+	## **Node Data_area**
 	##
 
-	## `Data` shall expand horizontally and vertically to claim
+	## `Data_area` shall expand horizontally and vertically to claim
 	## maximum space for plot artwork.
-	Data.size_flags_horizontal = SIZE_EXPAND_FILL
-	Data.size_flags_vertical = SIZE_EXPAND_FILL
+	Data_area.size_flags_horizontal = SIZE_EXPAND_FILL
+	Data_area.size_flags_vertical = SIZE_EXPAND_FILL
 
-	## `Data_bound` shows the bounds of `Data`.
+	## `Data_bound` shows the bounds of `Data_area`.
 	Data_bound.editor_only = false
 	Data_bound.border_color = Color8(0x80, 0xFF, 0x80, 0x80)
 
+
+	## `Title_bound` shows the bounds of `Title_area`.
+	Title_bound.editor_only = false
+	Title_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
 
 	## Use Y1Axis_bound to visualize space for the Y1 axis
 	Y1Axis_bound.rect_min_size = Vector2(100,0)
 	Y1Axis_bound.editor_only = false
 	Y1Axis_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
 
-	## Use XAxis_bound to visualize space for the X axis
+	# Use XAxis_bound to block off space for the X axis
 	XAxis_bound.rect_min_size = Vector2(0,20)
+	# Use XAxis_bound to visualize space for the X axis
 	XAxis_bound.editor_only = false
 	XAxis_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
 	XAxis_bound.size_flags_horizontal = SIZE_EXPAND_FILL
 
-	## Use Origin_bound to block off dead space under the Y1Axis
+	# Use Origin_bound to block off dead space under the Y1Axis
 	Origin_bound.rect_min_size = Vector2(
 		Y1Axis_bound.rect_min_size.x,
 		XAxis_bound.rect_min_size.y
 		)
+	# Use Origin_bound to visualize the dead space under the Y1Axis
 	Origin_bound.editor_only = false
 	Origin_bound.border_color = Color8(0xFF, 0xFF, 0xFF, 0x80)
 
-	## Use UpLeft_bound to block off dead space under the Y1Axis
-	UpLeft_bound.rect_min_size = Vector2(
+	# Use UpLeft_area to block off dead space above the Y1Axis
+	UpLeft_area.rect_min_size = Vector2(
 		Y1Axis_bound.rect_min_size.x,
-		Title.rect_size.y
+		Title_area.rect_size.y
 		)
+	# Use UpLeft_bound to visualize the dead space above the Y1Axis.
 	UpLeft_bound.editor_only = false
 	UpLeft_bound.border_color = Color8(0xFF, 0xFF, 0xFF, 0x80)
 
@@ -190,14 +200,13 @@ func _process(_delta) -> void:
 	# Write values in HudLeft text overlay
 	HudLeft.Main = myu.report_size_and_position(self)
 	HudLeft.App = myu.report_size_and_position(App)
-	HudLeft.PlotArea = myu.report_size_and_position(PlotArea)
-	HudLeft.PlotArea_bound = myu.report_size_and_position(PlotArea_bound)
+	HudLeft.Plot_area = myu.report_size_and_position(Plot_area)
 	HudLeft.PlotParts = myu.report_size_and_position(PlotParts)
-	HudLeft.UpLeft_bound = myu.report_size_and_position(UpLeft_bound)
+	HudLeft.UpLeft_area = myu.report_size_and_position(UpLeft_area)
+	HudLeft.Title_area = myu.report_size_and_position(Title_area)
 	HudLeft.Title = myu.report_size_and_position(Title)
 	HudLeft.Y1Axis_bound = myu.report_size_and_position(Y1Axis_bound)
-	HudLeft.Data = myu.report_size_and_position(Data)
-	HudLeft.Data_bound = myu.report_size_and_position(Data_bound)
+	HudLeft.Data_area = myu.report_size_and_position(Data_area)
 	HudLeft.Origin_bound = myu.report_size_and_position(Origin_bound)
 	HudLeft.XAxis_bound  = myu.report_size_and_position(XAxis_bound)
 	HudLeft.KeyPress = myu.report_size_and_position(KeyPress)
@@ -206,14 +215,13 @@ func _process(_delta) -> void:
 
 	HudLeft.text = """{Main}
 {App}
-{PlotArea}
-{PlotArea_bound}
+{Plot_area}
 {PlotParts}
-{UpLeft_bound}
+{UpLeft_area}
+{Title_area}
 {Title}
 {Y1Axis_bound}
-{Data}
-{Data_bound}
+{Data_area}
 {Origin_bound}
 {XAxis_bound}
 {KeyPress}
@@ -221,14 +229,13 @@ func _process(_delta) -> void:
 {HudRight}""".format({
 		"Main":HudLeft.Main,
 		"App":HudLeft.App,
-		"PlotArea":HudLeft.PlotArea,
-		"PlotArea_bound":HudLeft.PlotArea_bound,
+		"Plot_area":HudLeft.Plot_area,
 		"PlotParts":HudLeft.PlotParts,
-		"UpLeft_bound":HudLeft.UpLeft_bound,
+		"UpLeft_area":HudLeft.UpLeft_area,
+		"Title_area":HudLeft.Title_area,
 		"Title":HudLeft.Title,
 		"Y1Axis_bound":HudLeft.Y1Axis_bound,
-		"Data":HudLeft.Data,
-		"Data_bound":HudLeft.Data_bound,
+		"Data_area":HudLeft.Data_area,
 		"Origin_bound":HudLeft.Origin_bound,
 		"XAxis_bound":HudLeft.XAxis_bound,
 		"KeyPress":HudLeft.KeyPress,
@@ -237,7 +244,7 @@ func _process(_delta) -> void:
 		})
 	# Write values in HudRight text overlay
 	HudRight.GlobalMouse = get_global_mouse_position()
-	HudRight.LocalMouse = PlotArea.get_local_mouse_position()
+	HudRight.LocalMouse = Plot_area.get_local_mouse_position()
 
 	HudRight.text = "GLOBAL MOUSE: {GlobalMouse}\nLOCAL MOUSE: {LocalMouse}".format({
 		"GlobalMouse":HudRight.GlobalMouse,
@@ -254,7 +261,7 @@ func _process(_delta) -> void:
 
 	# Create base memory for lines
 	global_lines = Node2D.new()
-	PlotArea.add_child(global_lines)
+	Data_area.add_child(global_lines)
 
 	# Make the lines
 	var lines : Array = []
@@ -270,7 +277,10 @@ func _process(_delta) -> void:
 			)
 		## Randomize the points in the line.
 		for _point in range(4):
-			lines[i].add_point(Vector2(randi()%242+100,randi()%142+100))
+			lines[i].add_point( Vector2(
+				randi()%int(Data_area.rect_size.x),
+				randi()%int(Data_area.rect_size.y)
+				))
 
 
 ##
@@ -301,7 +311,7 @@ func _input(event) -> void:
 			elif key == "F2":
 				Dev.visible = not Dev.visible
 			elif key == "F3":
-				PlotArea_bound.editor_only = not PlotArea_bound.editor_only
+				Plot_bound.editor_only = not Plot_bound.editor_only
 
 
 		# Key released
