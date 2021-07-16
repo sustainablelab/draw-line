@@ -2,7 +2,7 @@
 
    type |  GDScript file  | nlines | details
 ------- | --------------- | ------ | -------
- script |         Main.gd |    342 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
+ script |         Main.gd |    370 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
  script |  MyUtilities.gd |     52 | extends Node
  script |      HudLeft.gd |     25 | extends Label
  script |     KeyPress.gd |     15 | extends Label
@@ -11,19 +11,22 @@
 
 ## Summary
 
-    Main.gd: 342 lines
+    Main.gd: 370 lines
 
 Read Main.gd by starting at the `_ready()` callback on line
 58.
 
 All drawing happens in the `_process()` callback on line
-197.
+201.
 
 ## Table of Contents
 
 - [4 : Globals](Main.md#globals)
-- [52 : Application](Main.md#application)
-- [296 : User Input](Main.md#user-input)
+- [52 : Setup](Main.md#setup)
+- [195 : Draw](Main.md#draw)
+- [249 : User Input](Main.md#user-input)
+- [278 : KeyPress Functions](Main.md#keypress-functions)
+- [303 : Draw functions](Main.md#draw-functions)
 
 ## Globals
 ### Libraries
@@ -60,7 +63,7 @@ plot lines.
     App/Plot_area/PlotParts/XAxis_bound
     App/Plot_area/PlotParts/Origin_bound
     App/KeyPress
-## Application
+## Setup
 
 \brief Application Setup
 
@@ -119,10 +122,11 @@ maximum space for plot artwork.
 `Data_bound` shows the bounds of `Data_area`.
 `Title_bound` shows the bounds of `Title_area`.
 Use Y1Axis_bound to visualize space for the Y1 axis
+## Draw
 
 \brief Application Loop
 
-    197 : func _process(_delta) -> void:
+    201 : func _process(_delta) -> void:
 Write text to HUD text overlay.
 Title the plot.
 Draw lines.
@@ -132,22 +136,32 @@ Randomize the points in the line.
 
 \brief Create a line with default width
 
-    289 : func new_line() -> Line2D:
+    242 : func new_line() -> Line2D:
 ## User Input
 
 \brief Handle keyboard input
 
-    302 : func _input(event) -> void:
+    255 : func _input(event) -> void:
 Esc quits.
 F2 toggles HUD text overlay.
 F3 toggles bounding boxes.
+## KeyPress Functions
 
 \brief Quit when user presses Esc
 
-    326 : func keypress_esc() -> void:
+    284 : func keypress_esc() -> void:
 
 \brief Toggle bounding boxes when user presses F3
 
-    334 : func keypress_F3() -> void:
+    292 : func keypress_F3() -> void:
+## Draw functions
+
+\brief Display mouse coordinates in HudRight
+
+    309 : func HudRight_write_text() -> void:
+
+\brief Report size and position of Nodes in HudLeft
+
+    324 : func HudLeft_write_text() -> void:
 
 bob

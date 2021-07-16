@@ -48,9 +48,9 @@ onready var Origin_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Or
 onready var KeyPress:     Label           = get_node("App/KeyPress")
 
 
-# ---------------
-# | Application |
-# ---------------
+# ---------
+# | Setup |
+# ---------
 
 ##
 ## \brief Application Setup
@@ -191,65 +191,18 @@ func _ready() -> void:
 	print_tree()
 
 
+# --------
+# | Draw |
+# --------
+
 ##
 ## \brief Application Loop
 ##
 func _process(_delta) -> void:
 
 	## Write text to HUD text overlay.
-	# Write values in HudLeft text overlay
-	HudLeft.Main = myu.report_size_and_position(self)
-	HudLeft.App = myu.report_size_and_position(App)
-	HudLeft.Plot_area = myu.report_size_and_position(Plot_area)
-	HudLeft.PlotParts = myu.report_size_and_position(PlotParts)
-	HudLeft.UpLeft_area = myu.report_size_and_position(UpLeft_area)
-	HudLeft.Title_area = myu.report_size_and_position(Title_area)
-	HudLeft.Title = myu.report_size_and_position(Title)
-	HudLeft.Y1Axis_bound = myu.report_size_and_position(Y1Axis_bound)
-	HudLeft.Data_area = myu.report_size_and_position(Data_area)
-	HudLeft.Origin_bound = myu.report_size_and_position(Origin_bound)
-	HudLeft.XAxis_bound  = myu.report_size_and_position(XAxis_bound)
-	HudLeft.KeyPress = myu.report_size_and_position(KeyPress)
-	HudLeft.HudLeft = myu.report_size_and_position(HudLeft)
-	HudLeft.HudRight = myu.report_size_and_position(HudRight)
-
-	HudLeft.text = """{Main}
-{App}
-{Plot_area}
-{PlotParts}
-{UpLeft_area}
-{Title_area}
-{Title}
-{Y1Axis_bound}
-{Data_area}
-{Origin_bound}
-{XAxis_bound}
-{KeyPress}
-{HudLeft}
-{HudRight}""".format({
-		"Main":HudLeft.Main,
-		"App":HudLeft.App,
-		"Plot_area":HudLeft.Plot_area,
-		"PlotParts":HudLeft.PlotParts,
-		"UpLeft_area":HudLeft.UpLeft_area,
-		"Title_area":HudLeft.Title_area,
-		"Title":HudLeft.Title,
-		"Y1Axis_bound":HudLeft.Y1Axis_bound,
-		"Data_area":HudLeft.Data_area,
-		"Origin_bound":HudLeft.Origin_bound,
-		"XAxis_bound":HudLeft.XAxis_bound,
-		"KeyPress":HudLeft.KeyPress,
-		"HudLeft":HudLeft.HudLeft,
-		"HudRight":HudLeft.HudRight
-		})
-	# Write values in HudRight text overlay
-	HudRight.GlobalMouse = get_global_mouse_position()
-	HudRight.LocalMouse = Data_area.get_local_mouse_position()
-
-	HudRight.text = "GLOBAL MOUSE: {GlobalMouse}\nLOCAL MOUSE: {LocalMouse}".format({
-		"GlobalMouse":HudRight.GlobalMouse,
-		"LocalMouse":HudRight.LocalMouse
-		})
+	HudLeft_write_text()
+	HudRight_write_text()
 
 	## Title the plot.
 	Title.text = "PUT PLOT TITLE IN Title.text"
@@ -320,6 +273,11 @@ func _input(event) -> void:
 		if not event.pressed:
 			KeyPress.text = ""
 
+
+# ----------------------
+# | KeyPress Functions |
+# ----------------------
+
 ##
 ## \brief Quit when user presses Esc
 ##
@@ -340,3 +298,73 @@ func keypress_F3() -> void:
 	XAxis_bound.editor_only  = not XAxis_bound.editor_only
 	Origin_bound.editor_only = not Origin_bound.editor_only
 
+
+# ------------------
+# | Draw functions |
+# ------------------
+
+##
+## \brief Display mouse coordinates in HudRight
+##
+func HudRight_write_text() -> void:
+	# Updates strings
+	HudRight.GlobalMouse = get_global_mouse_position()
+	HudRight.LocalMouse = Data_area.get_local_mouse_position()
+
+	# Combine into one string
+	HudRight.text = "GLOBAL MOUSE: {GlobalMouse}\nLOCAL MOUSE: {LocalMouse}".format({
+		"GlobalMouse":HudRight.GlobalMouse,
+		"LocalMouse":HudRight.LocalMouse
+		})
+
+
+##
+## \brief Report size and position of Nodes in HudLeft
+##
+func HudLeft_write_text() -> void:
+	# Update strings
+	HudLeft.Main = myu.report_size_and_position(self)
+	HudLeft.App = myu.report_size_and_position(App)
+	HudLeft.Plot_area = myu.report_size_and_position(Plot_area)
+	HudLeft.PlotParts = myu.report_size_and_position(PlotParts)
+	HudLeft.UpLeft_area = myu.report_size_and_position(UpLeft_area)
+	HudLeft.Title_area = myu.report_size_and_position(Title_area)
+	HudLeft.Title = myu.report_size_and_position(Title)
+	HudLeft.Y1Axis_bound = myu.report_size_and_position(Y1Axis_bound)
+	HudLeft.Data_area = myu.report_size_and_position(Data_area)
+	HudLeft.Origin_bound = myu.report_size_and_position(Origin_bound)
+	HudLeft.XAxis_bound  = myu.report_size_and_position(XAxis_bound)
+	HudLeft.KeyPress = myu.report_size_and_position(KeyPress)
+	HudLeft.HudLeft = myu.report_size_and_position(HudLeft)
+	HudLeft.HudRight = myu.report_size_and_position(HudRight)
+
+	# Combine into one string
+	HudLeft.text = """{Main}
+{App}
+{Plot_area}
+{PlotParts}
+{UpLeft_area}
+{Title_area}
+{Title}
+{Y1Axis_bound}
+{Data_area}
+{Origin_bound}
+{XAxis_bound}
+{KeyPress}
+{HudLeft}
+{HudRight}""".format({
+		"Main":HudLeft.Main,
+		"App":HudLeft.App,
+		"Plot_area":HudLeft.Plot_area,
+		"PlotParts":HudLeft.PlotParts,
+		"UpLeft_area":HudLeft.UpLeft_area,
+		"Title_area":HudLeft.Title_area,
+		"Title":HudLeft.Title,
+		"Y1Axis_bound":HudLeft.Y1Axis_bound,
+		"Data_area":HudLeft.Data_area,
+		"Origin_bound":HudLeft.Origin_bound,
+		"XAxis_bound":HudLeft.XAxis_bound,
+		"KeyPress":HudLeft.KeyPress,
+		"HudLeft":HudLeft.HudLeft,
+		"HudRight":HudLeft.HudRight
+		})
