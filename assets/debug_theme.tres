@@ -1,4 +1,10 @@
-[gd_resource type="Theme" format=2]
+[gd_resource type="Theme" load_steps=3 format=2]
+
+[ext_resource path="res://assets/Inconsolata-Regular.ttf" type="DynamicFontData" id=1]
+
+[sub_resource type="DynamicFont" id=1]
+size = 15
+font_data = ExtResource( 1 )
 
 [resource]
 Label/colors/font_color = Color( 1, 1, 1, 1 )
@@ -8,7 +14,7 @@ Label/constants/line_spacing = 3
 Label/constants/shadow_as_outline = 0
 Label/constants/shadow_offset_x = 1
 Label/constants/shadow_offset_y = 1
-Label/fonts/font = null
+Label/fonts/font = SubResource( 1 )
 Label/styles/normal = null
 MarginContainer/constants/margin_bottom = 0
 MarginContainer/constants/margin_left = 0

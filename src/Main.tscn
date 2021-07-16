@@ -13,26 +13,18 @@ __meta__ = {
 }
 
 [node name="HUD" type="Label" parent="."]
-margin_right = 88.0
-margin_bottom = 48.0
+margin_bottom = 16.0
 size_flags_vertical = 0
-text = "Label
-Line1
-Line2"
 script = ExtResource( 4 )
 
 [node name="App" type="VBoxContainer" parent="."]
-margin_right = 88.0
-margin_bottom = 48.0
+margin_bottom = 20.0
 
 [node name="PlotArea" type="MarginContainer" parent="App"]
-margin_right = 88.0
 
 [node name="Placeholder" type="ReferenceRect" parent="App/PlotArea"]
-margin_right = 88.0
 
 [node name="KeyPress" parent="App" instance=ExtResource( 2 )]
 margin_top = 4.0
-margin_right = 88.0
-margin_bottom = 18.0
+margin_bottom = 20.0
 size_flags_vertical = 1

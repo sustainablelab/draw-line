@@ -46,14 +46,6 @@ func _ready() -> void:
 	# ---< DEBUG >---
 	# Print the final Scene Tree
 	print_tree()
-	# Report new sizes and positions AFTER containers do their work
-	var _ret # throwaway value returned by connect()
-	_ret = connect("resized", self, "_on_resized")
-	_ret = App.connect("resized",         self, "_on_App_resized")
-	_ret = PlotArea.connect("resized",    self, "_on_PlotArea_resized")
-	_ret = Placeholder.connect("resized", self, "_on_Placeholder_resized")
-	_ret = KeyPress.connect("resized",    self, "_on_KeyPress_resized")
-	_ret = Hud.connect("resized",         self, "_on_Hud_resized")
 
 func _input(event) -> void:
 	if event is InputEventKey:
@@ -77,6 +69,23 @@ func keypress_esc() -> void:
 
 ## Testing I can draw lines
 func _process(_delta) -> void:
+
+	## Write text to HUD text overlay
+	## Initialize values in Hud text overlay
+	Hud.Main = myu.report_size_and_position(self)
+	Hud.App = myu.report_size_and_position(App)
+	Hud.PlotArea = myu.report_size_and_position(PlotArea)
+	Hud.Placeholder = myu.report_size_and_position(Placeholder)
+	Hud.KeyPress = myu.report_size_and_position(KeyPress)
+	Hud.Hud = myu.report_size_and_position(Hud)
+	Hud.text = "{Main}\n{App}\n{PlotArea}\n{Placeholder}\n{KeyPress}\n{Hud}".format({
+		"Main":Hud.Main,
+		"App":Hud.App,
+		"PlotArea":Hud.PlotArea,
+		"Placeholder":Hud.Placeholder,
+		"KeyPress":Hud.KeyPress,
+		"Hud":Hud.Hud
+		})
 
 	## Free all lines
 	global_lines.free()
@@ -102,17 +111,3 @@ func new_line() -> Line2D:
 	var line = Line2D.new()
 	line.width = 2
 	return line
-
-
-func _on_resized():
-	myu.report_size_and_position(self)
-func _on_App_resized():
-	myu.report_size_and_position(App)
-func _on_PlotArea_resized():
-	myu.report_size_and_position(PlotArea)
-func _on_Placeholder_resized():
-	myu.report_size_and_position(Placeholder)
-func _on_KeyPress_resized():
-	myu.report_size_and_position(KeyPress)
-func _on_Hud_resized():
-	myu.report_size_and_position(Hud)

@@ -14,12 +14,14 @@ func log_to_stdout(scene : String, msg : String) -> void:
 		}))
 
 
-## \brief Print the size and position of a Control Node to stdout
+## \brief Report the size and position of a Control Node
 ##
-## Example: "@LOG(res://src/Main.tscn): Main size:(800, 300) position: (0, 0)"
+## Example: "node: Main    size: (800, 300)    position: (0, 0)"
 ##
 ## \param control: The Control node to report on.
-func report_size_and_position(control : Control) -> void:
+##
+## \return String for display in the HUD text overlay
+func report_size_and_position(control : Control) -> String:
 
 	## Get the name of this control node
 	var path = NodePath(control.get_path())
@@ -35,5 +37,13 @@ func report_size_and_position(control : Control) -> void:
 
 	size = String(rect.size)
 	pos = String(rect.position)
-	msg = "{n} size:{s} position: {p}".format({"n":name,"s":size,"p":pos})
-	log_to_stdout(filename, msg)
+	msg = "NODE: {n}{gap1}SIZE: {s}{gap2}POSITION: {p}{gap3}".format({
+		"n":name,
+		"gap1":" ".repeat(13 - name.length()),
+		"s":size,
+		"gap2":" ".repeat(13 - size.length()),
+		"p":pos,
+		"gap3":" ".repeat(13 - pos.length())
+		})
+	# log_to_stdout(filename, msg)
+	return msg

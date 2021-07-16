@@ -1,13 +1,15 @@
 extends Label
 
 
-# Called when the node enters the scene tree for the first time.
+var Main:        String = "---"
+var App:         String = "---"
+var PlotArea:    String = "---"
+var Placeholder: String = "---"
+var KeyPress:    String = "---"
+var Hud:         String = "---"
+
+
 func _ready():
-	align = Label.ALIGN_CENTER
 	valign = Label.VALIGN_TOP
+	size_flags_horizontal = Label.SIZE_SHRINK_CENTER
 	size_flags_vertical = Label.SIZE_EXPAND
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
