@@ -2,7 +2,7 @@
 
    type |  GDScript file  | nlines | details
 ------- | --------------- | ------ | -------
- script |         Main.gd |    323 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
+ script |         Main.gd |    342 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
  script |  MyUtilities.gd |     52 | extends Node
  script |      HudLeft.gd |     25 | extends Label
  script |     KeyPress.gd |     15 | extends Label
@@ -11,7 +11,7 @@
 
 ## Summary
 
-    Main.gd: 323 lines
+    Main.gd: 342 lines
 
 Read Main.gd by starting at the `_ready()` callback on line
 58.
@@ -23,7 +23,7 @@ All drawing happens in the `_process()` callback on line
 
 - [4 : Globals](Main.md#globals)
 - [52 : Application](Main.md#application)
-- [293 : User Input](Main.md#user-input)
+- [296 : User Input](Main.md#user-input)
 
 ## Globals
 ### Libraries
@@ -132,15 +132,22 @@ Randomize the points in the line.
 
 \brief Create a line with default width
 
-    286 : func new_line() -> Line2D:
+    289 : func new_line() -> Line2D:
 ## User Input
 
 \brief Handle keyboard input
 
-    299 : func _input(event) -> void:
+    302 : func _input(event) -> void:
+Esc quits.
+F2 toggles HUD text overlay.
+F3 toggles bounding boxes.
 
 \brief Quit when user presses Esc
 
-    321 : func keypress_esc() -> void:
+    326 : func keypress_esc() -> void:
+
+\brief Toggle bounding boxes when user presses F3
+
+    334 : func keypress_F3() -> void:
 
 bob

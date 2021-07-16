@@ -244,7 +244,7 @@ func _process(_delta) -> void:
 		})
 	# Write values in HudRight text overlay
 	HudRight.GlobalMouse = get_global_mouse_position()
-	HudRight.LocalMouse = Plot_area.get_local_mouse_position()
+	HudRight.LocalMouse = Data_area.get_local_mouse_position()
 
 	HudRight.text = "GLOBAL MOUSE: {GlobalMouse}\nLOCAL MOUSE: {LocalMouse}".format({
 		"GlobalMouse":HudRight.GlobalMouse,
@@ -306,13 +306,15 @@ func _input(event) -> void:
 		if event.pressed and not event.echo:
 			var key : String = OS.get_scancode_string(event.scancode)
 			KeyPress.text = key
+			## Esc quits.
 			if key == "Escape":
 				keypress_esc()
+			## F2 toggles HUD text overlay.
 			elif key == "F2":
 				Dev.visible = not Dev.visible
+			## F3 toggles bounding boxes.
 			elif key == "F3":
-				Plot_bound.editor_only = not Plot_bound.editor_only
-
+				keypress_F3()
 
 		# Key released
 		if not event.pressed:
@@ -324,3 +326,17 @@ func _input(event) -> void:
 func keypress_esc() -> void:
 	myu.log_to_stdout(filename, "User quit with Esc")
 	get_tree().quit()
+
+
+##
+## \brief Toggle bounding boxes when user presses F3
+##
+func keypress_F3() -> void:
+	Plot_bound.editor_only   = not Plot_bound.editor_only
+	UpLeft_bound.editor_only = not UpLeft_bound.editor_only
+	Title_bound.editor_only  = not Title_bound.editor_only
+	Y1Axis_bound.editor_only = not Y1Axis_bound.editor_only
+	Data_bound.editor_only   = not Data_bound.editor_only
+	XAxis_bound.editor_only  = not XAxis_bound.editor_only
+	Origin_bound.editor_only = not Origin_bound.editor_only
+
