@@ -50,22 +50,86 @@ onready var myu : Node = preload("res://src/MyUtilities.tscn").instance()
 
 # Example using a function defined in MyUtilities.gd
 func _ready():
+	add_child(myu, true)
 	myu.log_to_stdout(filename, "Enter scene tree")
 ```
 
-Why do it this way? There are only two options.
+The reason to `add_child()` is memory management. If I make it a
+child of another node, I avoid the memory leak error message when
+quitting the application.
+
+`myu` is a Node. If I do not add it to the Scene Tree, it is an
+**orphaned node**. Godot does not automatically make it a child
+of the root node. Godot does not automatically make it a child of
+the node the caller script is attached to. Godot does not
+automatically add nodes to the Scene Tree. I have to do that with
+`add_child`.
+
+I only add this node once, so it's not a big deal that it is
+orphaned. And Godot runs just fine until the application exits.
+When I exit, I call `get_tree().quit()`, and this frees all the
+nodes on the tree. But `myu` is an **orphaned node**, and
+therefore it is not freed. It is a memory leak. At this point
+Godot realizes the node is orphaned and I get the error. The
+error is invisible unless someone is reading the messages printed
+to stderr (the terminal where Godot was launched from).
+
+Why put my utility functions in a scene?
 
 - I cannot attach `MyUtilities.gd` to node `Main`
     - a node can only have one script attached to it
     - `Main` already has `Main.gd` attached
 - I cannot "include" `MyUtilities.gd` in `Main.gd`
     - there is no "import" or "include" mechanism
-- The other option for splitting up code across files is to make
-  a script that defines a new class
+
+The only other option I'm aware of for splitting code across
+files is to use another script to create a class.
+
+- the script begins with `class_name`
 - Godot sees the script in my `src` folder and "picks up" the new
   class under the hood
 - then I make an instance of the class
 - so it's just like making an instance of `MyUtilities.tscn`
+
+The annoying thing about creating a class in this way is that the
+script cannot reference itself. For example, I want to make a
+struct, so I create a class script and put variables in it:
+
+```GDScript
+# Axis.gd
+class_name Axis
+
+var first : float
+var directed_length : float
+
+func _init(_first : float, _directed_length : float) -> void:
+	first = _first
+	directed_length = _directed_length
+```
+
+Instances of class `Axis` are references, so if I copy one axis
+to another by assignment, I'm effectively copying the pointer to
+the struct and incrementing Godot's reference counter for the
+chunk of memory that holds the struct members. I am not
+allocating a new chunk of memory that gets the struct member
+values copied into it.
+
+So it seems reasonable I'd want to make a `copy_from()` function
+that copies values from another `Axis` instance into this
+instance. And it seems reasonable I'd want that `copy_from()`
+function to be a method of the `Axis` class:
+
+```GDScript
+# Axis.gd -- WRONG
+
+func copy_from(axis : Axis) -> void:
+	first = axis.first
+	directed_length = axis.directed_length
+```
+
+This is likely to change in Godot v4.0, but for now, the script
+that defines the `Axis` class cannot reference the `Axis` class.
+Doing so results in lots of memory leak error messages.
 
 Main is a `VBoxContainer` because I like to see my key presses in
 the lower-right corner of the screen. Here is the setup.
@@ -725,64 +789,39 @@ func report_size_and_position(control : Control) -> String:
 
 # Scrap paper
 
-**Scene Tree** for `plot-gui`:
+Latest scene tree:
 
-```scene-tree
-Godot Engine v3.2.3.stable.official - https://godotengine.org
-OpenGL ES 2.0 Renderer: NVIDIA GeForce GTX 1080/PCIe/SSE2
-OpenGL ES 2.0 Batching: ON
- 
-@LOG(HudHelp.gd): _ready()
-@LOG(Clipper.gd): _ready()
-@LOG(Figure.gd): _ready()
-@LOG(HudDebug.gd): _ready()
-@LOG(Main.gd): _ready()
-@LOG(MyUtilities.gd): _ready(), run tests? False
+```print-tree-pretty
  ┖╴Main
-    ┠╴Bgnd
-    ┃  ┖╴Color
-    ┠╴ScreenTop
-    ┃  ┠╴HudHelp
-    ┃  ┃  ┖╴@@2
-    ┃  ┠╴Figure
-    ┃  ┃  ┠╴Mouse
-    ┃  ┃  ┖╴FigColumns
-    ┃  ┃     ┠╴Y1
-    ┃  ┃     ┠╴MouseY
-    ┃  ┃     ┠╴TickY1Shadow
-    ┃  ┃     ┠╴FigMiddle
+    ┠╴App
+    ┃  ┠╴Plot_area
+    ┃  ┃  ┠╴Plot_bound
+    ┃  ┃  ┖╴PlotParts
+    ┃  ┃     ┠╴UpLeft_area
+    ┃  ┃     ┃  ┖╴UpLeft_bound
+    ┃  ┃     ┠╴Title_area
     ┃  ┃     ┃  ┠╴Title
-    ┃  ┃     ┃  ┃  ┖╴@@3
-    ┃  ┃     ┃  ┠╴PlotArea
-    ┃  ┃     ┃  ┃  ┠╴BobNotClipped
-    ┃  ┃     ┃  ┃  ┠╴Y1AxisName
-    ┃  ┃     ┃  ┃  ┠╴Y2AxisName
-    ┃  ┃     ┃  ┃  ┠╴Clipper
-    ┃  ┃     ┃  ┃  ┃  ┠╴BobClipped
-    ┃  ┃     ┃  ┃  ┃  ┖╴@@11
-    ┃  ┃     ┃  ┃  ┠╴@@9
-    ┃  ┃     ┃  ┃  ┖╴@@10
-    ┃  ┃     ┃  ┠╴TickXShadow
-    ┃  ┃     ┃  ┠╴MouseX
-    ┃  ┃     ┃  ┖╴XAxisName
-    ┃  ┃     ┖╴Y2
-    ┃  ┖╴RightText
-    ┃     ┠╴FileNameLabel
-    ┃     ┠╴FileName
-    ┃     ┠╴FileHeaderLabel
-    ┃     ┖╴FileHeader
-    ┠╴ScreenBottom
-    ┃  ┠╴Messages
-    ┃  ┃  ┠╴Status
-    ┃  ┃  ┃  ┖╴@@4
-    ┃  ┃  ┖╴Cmdline
-    ┃  ┃     ┠╴@@5
-    ┃  ┃     ┖╴@@7
-    ┃  ┃        ┖╴@@6
+    ┃  ┃     ┃  ┖╴Title_bound
+    ┃  ┃     ┠╴UpRight_area
+    ┃  ┃     ┃  ┖╴UpRight_bound
+    ┃  ┃     ┠╴Y1Axis_area
+    ┃  ┃     ┃  ┖╴Y1Axis_bound
+    ┃  ┃     ┠╴Data_area
+    ┃  ┃     ┃  ┖╴Data_bound
+    ┃  ┃     ┠╴Y2Axis_area
+    ┃  ┃     ┃  ┖╴Y2Axis_bound
+    ┃  ┃     ┠╴Origin_area
+    ┃  ┃     ┃  ┖╴Origin_bound
+    ┃  ┃     ┠╴XAxis_area
+    ┃  ┃     ┃  ┖╴XAxis_bound
+    ┃  ┃     ┖╴DownRight_area
+    ┃  ┃        ┖╴DownRight_bound
     ┃  ┖╴KeyPress
-    ┠╴HudHelpShadow
-    ┠╴HudDebug
-    ┃  ┖╴@@8
+    ┃     ┖╴MyUtilities
+    ┠╴Dev
+    ┃  ┠╴HudLeft
+    ┃  ┖╴HudRight
     ┠╴MyUtilities
-    ┖╴@@12
-```
+    ┖╴CanvasLayer
+       ┖╴ColorRect
+
