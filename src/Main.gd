@@ -266,16 +266,18 @@ func _ready() -> void:
 ##
 func _process(_delta) -> void:
 
+	##
+	## **Draw plot artwork**
+	##
+
 	## Title the plot.
 	Title.text = "PUT PLOT TITLE IN Title.text"
 
-	# ---< Draw lines >---
-
-	# Free all lines
+	## Free all old plot artwork by freeing the scene tree nodes.
 	global_data_art.free()
 	global_grid_art.free()
 
-	# Create base memory for lines
+	## Allocate scene tree nodes for new plot artwork.
 	global_data_art = Node2D.new()
 	global_grid_art = Node2D.new()
 	Data_area.add_child(global_data_art)
@@ -285,12 +287,13 @@ func _process(_delta) -> void:
 	make_grid_lines()
 
 	## Define the axes:
-	## X and Y ranges and an offset into those ranges.
+	## Axes are X and Y ranges
+	## and the x,y offset into those ranges.
 	var axes : Axes = make_axes()
 
 	## Make the data and the data line artwork.
 
-	# make_dancing_lines() # cool visual without data
+	# make_dancing_lines() # cool visual without requiring data
 
 	# Make some fake data to plot.
 	var data : PoolVector2Array = fake_data()

@@ -37,6 +37,10 @@ def is_doc_comment(line:str) -> bool:
     if line.strip().startswith("##"):
         return True
 
+def is_start_of_func_docstring(line:str) -> bool:
+    if "\\brief" in line:
+        return True
+
 def is_get_node(line:str) -> bool:
     if "get_node(" in line:
         return True
@@ -55,6 +59,7 @@ def get_toc(code_filepath: pathlib.Path) -> list:
                 toc.append(level1)
     return toc
 
+# TODO: gotta rename this to show it is more than section names
 def get_section_names(code_filepath: pathlib.Path) -> list:
     """Return lines from code file formatted for markdown.
 
@@ -79,11 +84,14 @@ def get_section_names(code_filepath: pathlib.Path) -> list:
     section_names = []
     line_num = 0
     part_of_multiline_func = False
+    part_of_func_docstring = False
     with code_filepath.open() as f:
         for line in f:
             line_num += 1
+            if not is_doc_comment(line):
+                part_of_func_docstring = False
             if part_of_multiline_func:
-                section_names.append(f"        {line.strip()}")
+                section_names.append(f"        {line.strip()}\n")
                 if ")" in line:
                     part_of_multiline_func = False
             else:
@@ -98,20 +106,34 @@ def get_section_names(code_filepath: pathlib.Path) -> list:
                     level3 = f"#### {name}"
                     section_names.append(level3)
                 elif is_gdscript_function(line): # func my_func(var_t : var) -> ret_t:
-                    line_as_code_block = f"    {line_num} : {line.strip()}"
-                    section_names.append(line_as_code_block)
-                    # Pick up multiline function signatures
                     if not ")" in line:
                         part_of_multiline_func = True
-                elif is_doc_comment(line): # doc comments start with ##
-                    line = line.lstrip()
-                    if line != "##":
-                        line_as_plain_text = line.strip("##").strip()
+                        line_as_code_block = f"\n    {line_num} : {line.strip()}"
                     else:
-                        # Do not strip newline if doc comment is blank.
-                        line_as_plain_text = line.strip("##")
-                    section_names.append(line_as_plain_text)
-                    # section_names.append(line)
+                        line_as_code_block = f"\n    {line_num} : {line.strip()}\n"
+                    section_names.append(line_as_code_block)
+                    # Pick up multiline function signatures
+                elif is_start_of_func_docstring(line): # starts with ## \brief
+                    line_as_docstring = "**" + line.strip("## ").strip("\\brief").strip() + "**"
+                    section_names.append(f"> {line_as_docstring}")
+                    part_of_func_docstring = True
+                elif is_doc_comment(line): # doc comments start with ##
+                    if part_of_func_docstring:
+                        if line.strip() != "##":
+                            line_as_docstring = "*" + line.strip("## ").strip() + "*"
+                            # line_as_docstring = f"> {line.strip('## ').strip()}"
+                            section_names.append(f"> {line_as_docstring}")
+                        else:
+                            section_names.append(f">")
+                    else:
+                        line = line.lstrip()
+                        if line != "##":
+                            line_as_plain_text = line.strip("##").strip()
+                        else:
+                            # Do not strip newline if doc comment is blank.
+                            line_as_plain_text = line.strip("##")
+                        section_names.append(line_as_plain_text)
+                        # section_names.append(line)
                 elif is_get_node(line): # get_node("Node1/Node2')
                     node_name = line.split('(')[1].split(')')[0].strip('"')
                     node_name_as_code_block = f"    {node_name}"
@@ -119,11 +141,39 @@ def get_section_names(code_filepath: pathlib.Path) -> list:
 
     return section_names
 
+def is_global(line:str) -> bool:
+    return line.startswith("var") or line.startswith("onready var")
+
+def is_global_var(line:str) -> bool:
+    return (
+        is_global(line)
+        ) and (
+        "get_node(" not in line
+        ) and (
+        "preload(" not in line
+        )
+
+def is_scene_tree_node(line:str) -> bool:
+    return (
+        line.startswith("onready var")
+        ) and (
+        "get_node(" in line or "preload" in line
+        )
+
 def is_comment(line:str) -> bool:
     return (line.strip().startswith("#"))
 
 def is_blank(line:str) -> bool:
     return(line == "\n")
+
+def num_globals(code_filepath: pathlib.Path) -> int:
+    nlines = 0
+    with code_filepath.open() as f:
+        for line in f:
+            # Ignore scene tree node global variables
+            if is_global_var(line):
+                nlines += 1
+    return nlines
 
 def get_length(code_filepath: pathlib.Path) -> int:
     nlines = 0
@@ -137,6 +187,12 @@ def create_main_summary(code_filepath: pathlib.Path) -> str:
     length = get_length(code_filepath)
     toc_text = "\n".join(get_toc(code_filepath))
     section_names = get_section_names(code_filepath)
+    section_names.insert(
+        # After section Globals
+        section_names.index('## Globals') + 1,
+        # Insert all the globals
+        collect_globals(code_filepath)
+        )
     section_name_text = "\n".join(section_names)
     # Which line of code is _ready() on?
     ready_line_num = 0
@@ -169,6 +225,29 @@ def create_class_summary(code_filepath: pathlib.Path) -> str:
     return f"""bob
 """
 
+def collect_globals(code_filepath: pathlib.Path) -> str:
+    global_vars = []
+    global_nodes = []
+    with code_filepath.open() as f:
+        for line in f:
+            if is_global_var(line):
+                global_vars.append(line)
+            elif is_scene_tree_node(line):
+                global_nodes.append(line)
+    global_var_text = "".join(global_vars)
+    global_node_text = "".join(global_nodes)
+    return f"""
+Global variables:
+
+```
+{global_var_text}```
+
+*Scene tree node* global variables:
+
+```
+{global_node_text}```
+"""
+
 if __name__ == '__main__':
 
     # ----------------------------------
@@ -198,8 +277,8 @@ if __name__ == '__main__':
     with my_summary.open("w", encoding="utf-8") as o:
         o.write(f"""# File Summary
 
-   type |  GDScript file  |   LOC  | details
-------- | --------------- | ------ | -------
+   type |  GDScript file  |   LOC  | global | details
+------- | --------------- | ------ | ------ | -------
 """)
         my_code_files = list(src.glob("*.gd"))
         # Determine file type and details from first line of each file
@@ -230,9 +309,10 @@ if __name__ == '__main__':
                     file_types.append("unknown")
                     details.append(f"first line of code: {line}")
         lengths = [get_length(f) for f in my_code_files]
+        nglobals = [num_globals(f) for f in my_code_files]
         # Sort files by type
-        #                0             1          2       3
-        all_f = list(zip(my_code_files,file_types,lengths,details))
+        #                0             1          2       3        4
+        all_f = list(zip(my_code_files,file_types,lengths,nglobals,details))
         class_f = []
         script_f = []
         unknown_f = []
@@ -251,8 +331,8 @@ if __name__ == '__main__':
         unknown_f.sort(key = lambda t: t[2], reverse=True)
         # Combine them back together
         all_f = class_f + script_f + unknown_f
-        for f,t,l,d in all_f:
-            o.write(f"{t:>7} | {str(f.name):>15} | {l:>6} | {d}\n")
+        for f,t,l,n,d in all_f:
+            o.write(f"{t:>7} | {str(f.name):>15} | {l:>6} | {n:>6} | {d}\n")
 
         # ------------------------
         # | Write up for Main.gd |

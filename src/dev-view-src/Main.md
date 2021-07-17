@@ -1,14 +1,14 @@
 # File Summary
 
-   type |  GDScript file  |   LOC  | details
-------- | --------------- | ------ | -------
-  class |         Axes.gd |      8 | defines `class_name Axes`
-  class |         Axis.gd |      6 | defines `class_name Axis`
- script |         Main.gd |    344 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
- script |  MyUtilities.gd |     31 | extends Node
- script |      HudLeft.gd |     20 | extends Label
- script |     KeyPress.gd |     11 | extends Label
- script |     HudRight.gd |      9 | extends Label
+   type |  GDScript file  |   LOC  | global | details
+------- | --------------- | ------ | ------ | -------
+  class |         Axes.gd |      8 |      3 | defines `class_name Axes`
+  class |         Axis.gd |      6 |      2 | defines `class_name Axis`
+ script |         Main.gd |    344 |      5 | extends MarginContainer <--- THIS IS THE MAIN SCRIPT
+ script |  MyUtilities.gd |     31 |      0 | extends Node
+ script |      HudLeft.gd |     20 |     15 | extends Label
+ script |     KeyPress.gd |     11 |      0 | extends Label
+ script |     HudRight.gd |      9 |      4 | extends Label
 
 
 ## Summary
@@ -26,11 +26,51 @@ All drawing happens in the `_process()` callback on line
 - [4 : Globals](Main.md#globals)
 - [61 : Setup](Main.md#setup)
 - [261 : Draw](Main.md#draw)
-- [351 : User Input](Main.md#user-input)
-- [383 : KeyPress Functions](Main.md#keypress-functions)
-- [409 : Draw functions](Main.md#draw-functions)
+- [354 : User Input](Main.md#user-input)
+- [386 : KeyPress Functions](Main.md#keypress-functions)
+- [412 : Draw functions](Main.md#draw-functions)
 
 ## Globals
+
+Global variables:
+
+```
+var global_data_art := Node2D.new() # Parent node to hold all data Line2D nodes
+var global_grid_art := Node2D.new() # Parent node to hold all grid Line2D nodes
+var global_pan_offset := Vector2(0,0) # Plot panning in Axis coordinates
+var n_xticks := 10 # TEMP
+var n_yticks := 10 # TEMP
+```
+
+*Scene tree node* global variables:
+
+```
+onready var myu : Node = preload("res://src/MyUtilities.tscn").instance()
+onready var Dev:      HBoxContainer = get_node("Dev")
+onready var HudLeft:  Label         = get_node("Dev/HudLeft")
+onready var HudRight: Label         = get_node("Dev/HudRight")
+onready var App:          VBoxContainer   = get_node("App")
+onready var Plot_area:    MarginContainer = get_node("App/Plot_area")
+onready var Plot_bound:   ReferenceRect   = get_node("App/Plot_area/Plot_bound")
+onready var PlotParts:    GridContainer   = get_node("App/Plot_area/PlotParts")
+onready var UpLeft_area:  MarginContainer = get_node("App/Plot_area/PlotParts/UpLeft_area")
+onready var UpLeft_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/UpLeft_area/UpLeft_bound")
+onready var Title_area:   MarginContainer = get_node("App/Plot_area/PlotParts/Title_area")
+onready var Title:        Label           = get_node("App/Plot_area/PlotParts/Title_area/Title")
+onready var Title_bound:  ReferenceRect   = get_node("App/Plot_area/PlotParts/Title_area/Title_bound")
+onready var Y1Axis_area:  MarginContainer = get_node("App/Plot_area/PlotParts/Y1Axis_area")
+onready var Y1Axis_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Y1Axis_area/Y1Axis_bound")
+onready var Y2Axis_area:  MarginContainer = get_node("App/Plot_area/PlotParts/Y2Axis_area")
+onready var Y2Axis_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Y2Axis_area/Y2Axis_bound")
+onready var Data_area:    MarginContainer = get_node("App/Plot_area/PlotParts/Data_area")
+onready var Data_bound:   ReferenceRect   = get_node("App/Plot_area/PlotParts/Data_area/Data_bound")
+onready var XAxis_area:   MarginContainer = get_node("App/Plot_area/PlotParts/XAxis_area")
+onready var XAxis_bound:  ReferenceRect   = get_node("App/Plot_area/PlotParts/XAxis_area/XAxis_bound")
+onready var Origin_area:  MarginContainer = get_node("App/Plot_area/PlotParts/Origin_area")
+onready var Origin_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Origin_area/Origin_bound")
+onready var KeyPress:     Label           = get_node("App/KeyPress")
+```
+
 ### Libraries
 Utility functions are in `MyUtilities.gd`. To call a utility
 function:
@@ -72,9 +112,11 @@ artwork.
     App/KeyPress
 ## Setup
 
-\brief Application Setup
+> **Application Setup**
+>
 
     67 : func _ready() -> void:
+
 Randomize the seed for Godot's random number generator.
 Say hello.
 
@@ -171,105 +213,141 @@ the Y axis and left of the plot title.
 
 ## Draw
 
-\brief Application Loop
+> **Application Loop**
+>
 
     267 : func _process(_delta) -> void:
+
+
+**Draw plot artwork**
+
 Title the plot.
+Free all old plot artwork by freeing the scene tree nodes.
+Allocate scene tree nodes for new plot artwork.
 Make the X- and Y-axis **grid line** artwork.
 Define the axes:
-X and Y ranges and an offset into those ranges.
+Axes are X and Y ranges
+and the x,y offset into those ranges.
 Make the data and the data line artwork.
 Make the X- and Y-axis **tick label** artwork.
 Write text to HUD text overlay.
 
-\brief Find the linear transformation matrix from screen to data
+> **Find the linear transformation matrix from screen to data**
+>
+> *Given a pixel in the plot, transform it to the data value*
+> *implied by the plot axes.*
+>
+> *\param axes: The current X and Y axes on the screen.*
+> *\param rect_size: The size of the area where data is plotted.*
+>
+> *\return Transform2D matrix*
+>
 
-Given a pixel in the plot, transform it to the data value
-implied by the plot axes.
+    338 : func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
 
-\param axes: The current X and Y axes on the screen.
-\param rect_size: The size of the area where data is plotted.
-
-\return Transform2D matrix
-
-    335 : func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
 ## User Input
 
-\brief Handle keyboard input
+> **Handle keyboard input**
+>
 
-    357 : func _input(event) -> void:
+    360 : func _input(event) -> void:
+
 Esc quits.
 F1 toggles bounding boxes.
 F2 toggles HudLeft text overlay.
 F3 toggles HudRight text overlay.
 ## KeyPress Functions
 
-\brief Quit when user presses Esc
+> **Quit when user presses Esc**
+>
 
-    389 : func keypress_esc() -> void:
+    392 : func keypress_esc() -> void:
 
-\brief Toggle bounding boxes when user presses F1
 
-    397 : func keypress_F1() -> void:
+> **Toggle bounding boxes when user presses F1**
+>
+
+    400 : func keypress_F1() -> void:
+
 ## Draw functions
 
-\brief Create a line with default width
+> **Create a line with default width**
+>
 
-    415 : func new_line() -> Line2D:
+    418 : func new_line() -> Line2D:
 
-\brief Create a grid line
 
-    429 : func new_grid_line() -> Line2D:
+> **Create a grid line**
+>
+
+    432 : func new_grid_line() -> Line2D:
+
 Make grid lines skinny.
 Make grid lines dark green and transparent.
 
-\brief Label the grid lines
+> **Label the grid lines**
+>
+> *\param axes: The axes for the current "view" of the data.*
+>
 
-\param axes: The axes for the current "view" of the data.
+    451 : func make_grid_labels(axes : Axes) -> void:
 
-    448 : func make_grid_labels(axes : Axes) -> void:
 
-\brief Make the grid line artwork
+> **Make the grid line artwork**
+>
 
-    505 : func make_grid_lines() -> void:
+    508 : func make_grid_lines() -> void:
+
 Make a new line.
 Draw a line for each tick on the XAxis.
 Make a new line.
 Draw a line for each tick on the XAxis.
 
-\brief Define X and Y axes
+> **Define X and Y axes**
+>
+> *Each Axis has a `first` value and a `directed_length`.*
+> *Axes are an X Axis and a Y Axis together with an (x,y) offset*
+> *into the axes. The offset adds to the `first` value. The*
+> *`directed_length is unchanged, so all values are offset by the*
+> *offset.*
+>
 
-Each Axis has a `first` value and a `directed_length`.
-Axes are an X Axis and a Y Axis together with an (x,y) offset
-into the axes. The offset adds to the `first` value. The
-`directed_length is unchanged, so all values are offset by the
-offset.
+    560 : func make_axes() -> Axes:
 
-    557 : func make_axes() -> Axes:
 Make the axes.
 
-\brief Make the data and the data line artwork
+> **Make the data and the data line artwork**
+>
+> *This is for testing the interface without any data.*
+>
 
-This is for testing the interface without any data.
+    580 : func make_dancing_lines() -> void:
 
-    577 : func make_dancing_lines() -> void:
 Make a new line.
 Randomize its color.
 Randomize the points in the line.
 
-\brief Make fake data
+> **Make fake data**
+>
+> *This is for testing the interface with made up data.*
+>
 
-This is for testing the interface with made up data.
+    605 : func fake_data() -> PoolVector2Array:
 
-    602 : func fake_data() -> PoolVector2Array:
-    615 : func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
 
-\brief Display mouse coordinates in HudRight
+    618 : func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
 
-    632 : func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
 
-\brief Report size and position of Nodes in HudLeft
+> **Display mouse coordinates in HudRight**
+>
 
-    664 : func HudLeft_write_text() -> void:
+    635 : func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
+
+
+> **Report size and position of Nodes in HudLeft**
+>
+
+    667 : func HudLeft_write_text() -> void:
+
 
 bob
