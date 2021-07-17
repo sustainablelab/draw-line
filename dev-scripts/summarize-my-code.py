@@ -207,19 +207,28 @@ if __name__ == '__main__':
         details = []
         for my_code in my_code_files:
             with my_code.open() as f:
-                first_line = next(f).strip()
-                if first_line.startswith("class_name"):
+                line = "\n"
+                while is_blank(line) or is_comment(line):
+                    line = next(f)
+                line = line.strip()
+                if line.startswith("class_name"):
                     file_types.append("class")
-                    details.append(f"defines `{first_line}`")
-                elif first_line.startswith("extends"):
-                    file_types.append("script")
-                    if str(my_code.name) == 'Main.gd':
-                        details.append(f"{first_line} <--- THIS IS THE MAIN SCRIPT")
+                    details.append(f"defines `{line}`")
+                elif line.startswith("extends"):
+                    # Check for class_name on next line
+                    next_line = next(f).strip()
+                    if next_line.startswith("class_name"):
+                        file_types.append("class")
+                        details.append(f"defines `{next_line}`, `{line}`")
                     else:
-                        details.append(first_line)
+                        file_types.append("script")
+                    if str(my_code.name) == 'Main.gd':
+                        details.append(f"{line} <--- THIS IS THE MAIN SCRIPT")
+                    else:
+                        details.append(line)
                 else:
                     file_types.append("unknown")
-                    details.append(f"first line: {first_line}")
+                    details.append(f"first line of code: {line}")
         lengths = [get_length(f) for f in my_code_files]
         # Sort files by type
         #                0             1          2       3
