@@ -68,6 +68,10 @@ func _ready() -> void:
 	## Randomize the seed for Godot's random number generator.
 	randomize()
 
+	add_child(myu, true)
+	# Data_area.add_child(global_data_art, true)
+	# Data_area.add_child(global_grid_art, true)
+
 	## Say hello.
 	myu.log_to_stdout(filename, "Enter scene tree")
 
@@ -250,7 +254,7 @@ func _ready() -> void:
 
 	# ---< DEBUG >---
 	# Print the final Scene Tree
-	print_tree()
+	print_tree_pretty()
 
 
 # --------
@@ -552,14 +556,16 @@ func make_grid_lines() -> void:
 ##
 func make_axes() -> Axes:
 	## Make the axes.
-	var xAxis := Axis.new()
-	var yAxis := Axis.new()
+	var xAxis := Axis.new( # X-Axis: 99 to 199
+		99, # first
+		100 # directed_length
+		)
+	var yAxis := Axis.new( # Y-Axis: 456 to 856
+		456, # first
+		400 # directed_length
+		)
 	var axes := Axes.new(xAxis, yAxis, global_pan_offset)
 	# TEMP -- shall come from data
-	axes.x.first = 99
-	axes.x.directed_length = 100
-	axes.y.first = 456
-	axes.y.directed_length = 400
 	return axes
 
 

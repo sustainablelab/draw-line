@@ -20,25 +20,16 @@ class_name Axes
 ## This is a Reference (handled by Godot's reference counter).
 ##
 ## Assignment references the same memory.
-## Make copies with copy_from():
-##
-## ```
-## var destAxes := Axes.new(Axis.new(), Axis.new(), pan_offset)
-## destAxes.copy_from(srcAxes)
-## ```
+## Make copies by copying each member individually.
 ##
 var x : Axis
 var y : Axis
 var pan_offset : Vector2
 
-func _init(xAxis : Axis, yAxis : Axis, panOffset : Vector2) -> void:
-	x = xAxis
-	y = yAxis
-	pan_offset = panOffset
-
-func copy_from(axes : Axes) -> void:
-	# Use Axis.copy_from to copy the x axis and y axis
-	x.copy_from(axes.x)
-	y.copy_from(axes.y)
-	# Vector2 is a built-in type, so assignment acts as a copy
-	pan_offset = axes.pan_offset
+##
+## \brief Class constructor
+##
+func _init(_x : Axis, _y : Axis, _pan_offset : Vector2) -> void:
+	x = _x
+	y = _y
+	pan_offset = _pan_offset

@@ -19,16 +19,14 @@ class_name Axis
 ## This is a Reference (handled by Godot's reference counter).
 ##
 ## Assignment references the same memory.
-## Make copies with copy_from():
-##
-## ```
-## var destAxis := Axis.new()
-## destAxis.copy_from(srcAxis)
-## ```
+## Make copies by copying each member individually.
 ##
 var first : float
 var directed_length : float
 
-func copy_from(axis : Axis) -> void:
-	first = axis.first
-	directed_length = axis.directed_length
+##
+## \brief Class constructor
+##
+func _init(_first : float, _directed_length : float) -> void:
+	first = _first
+	directed_length = _directed_length
