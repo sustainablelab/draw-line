@@ -188,7 +188,7 @@ func _ready() -> void:
 	##
 
 	## `Y2Axis_area` sets the width of the Y-Axis to right of the data.
-	Y2Axis_area.rect_min_size = Vector2(50,0)
+	Y2Axis_area.rect_min_size = Vector2(20,0)
 
 	## `Y2Axis_bound` shows the bounds of `Y2Axis_area`.
 	Y2Axis_bound.editor_only = false
@@ -242,9 +242,11 @@ func _ready() -> void:
 	## **Node Dev**
 	##
 
-	## Start with all Developer art (bounding boxes) invisible. F3
-	## toggles visibility.
-	Dev.visible = false
+	# Start with HUD invisible.
+	# F2 toggles left HUD visibility.
+	# F3 toggles right HUD visibility.
+	HudLeft.visible = false
+	HudRight.visible = false
 
 	# ---< DEBUG >---
 	# Print the final Scene Tree
@@ -259,10 +261,6 @@ func _ready() -> void:
 ## \brief Application Loop
 ##
 func _process(_delta) -> void:
-
-	## Write text to HUD text overlay.
-	HudLeft_write_text()
-	HudRight_write_text()
 
 	## Title the plot.
 	Title.text = "PUT PLOT TITLE IN Title.text"
@@ -286,12 +284,64 @@ func _process(_delta) -> void:
 	## X and Y ranges and an offset into those ranges.
 	var axes : Axes = make_axes()
 
+	## Make the data and the data line artwork.
+
+	# make_dancing_lines() # cool visual without data
+
+	# Make some fake data to plot.
+	var data : PoolVector2Array = fake_data()
+	# Set axes based on data
+	axes.x.first = data[0].x
+	axes.x.directed_length = data[-1].x - axes.x.first
+	var d : Dictionary = myu.unzip(data)
+	var y : Array = d["y"]
+	axes.y.first = y.min()
+	axes.y.directed_length = y.max() - y.min()
+	# Transform data to screen coordinates.
+	# Method: set up the Screen-to-Data matrix, then take its
+	# inverse.
+	var xfmToData : Transform2D = transform_screen_to_data(axes, Data_area.rect_size)
+	var xfmToScreen : Transform2D = xfmToData.affine_inverse()
+	var plot_artwork : PoolVector2Array = xfmToScreen.xform(data)
+	# Draw the plot artwork
+	var line : Line2D = new_line()
+	global_data_art.add_child(line)
+	for p in plot_artwork:
+		line.add_point(p)
+
 	## Make the X- and Y-axis **tick label** artwork.
 	make_grid_labels(axes)
 
-	## Make the data and the data line artwork.
-	make_data_lines()
+	## Write text to HUD text overlay.
+	HudLeft_write_text()
+	HudRight_write_text(xfmToData, data)
 
+
+##
+## \brief Find the linear transformation matrix from screen to data
+##
+## Given a pixel in the plot, transform it to the data value
+## implied by the plot axes.
+##
+## \param axes: The current X and Y axes on the screen.
+## \param rect_size: The size of the area where data is plotted.
+##
+## \return Transform2D matrix
+##
+func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
+	# Transform2D is made up three Vector2 instances:
+	# Transform2D(Vector2 x, Vector2 y, Vector2 origin)
+	# Asserts to help me remember why I set rect_min_size == 1,1.
+	assert (rect_size.x != 0) # Otherwise get erorr: DIVIDE BY ZERO
+	assert (rect_size.y != 0) # Otherwise get erorr: DIVIDE BY ZERO
+	var scale_x := float(axes.x.directed_length / rect_size.x)
+	var scale_y := float(axes.y.directed_length / rect_size.y)
+	var Ox : float = axes.x.first
+	var Oy := float(scale_y*rect_size.y + axes.y.first)
+	var x := Vector2(scale_x,          0)
+	var y := Vector2(      0, -1*scale_y)
+	var o := Vector2(     Ox,         Oy)
+	return Transform2D(x,y,o)
 
 # --------------
 # | User Input |
@@ -310,12 +360,15 @@ func _input(event) -> void:
 			## Esc quits.
 			if key == "Escape":
 				keypress_esc()
-			## F2 toggles HUD text overlay.
+			## F1 toggles bounding boxes.
+			elif key == "F1":
+				keypress_F1()
+			## F2 toggles HudLeft text overlay.
 			elif key == "F2":
-				Dev.visible = not Dev.visible
-			## F3 toggles bounding boxes.
+				HudLeft.visible = not HudLeft.visible
+			## F3 toggles HudRight text overlay.
 			elif key == "F3":
-				keypress_F3()
+				HudRight.visible = not HudRight.visible
 
 		# Key released
 		if not event.pressed:
@@ -335,13 +388,14 @@ func keypress_esc() -> void:
 
 
 ##
-## \brief Toggle bounding boxes when user presses F3
+## \brief Toggle bounding boxes when user presses F1
 ##
-func keypress_F3() -> void:
+func keypress_F1() -> void:
 	Plot_bound.editor_only   = not Plot_bound.editor_only
 	UpLeft_bound.editor_only = not UpLeft_bound.editor_only
 	Title_bound.editor_only  = not Title_bound.editor_only
 	Y1Axis_bound.editor_only = not Y1Axis_bound.editor_only
+	Y2Axis_bound.editor_only = not Y2Axis_bound.editor_only
 	Data_bound.editor_only   = not Data_bound.editor_only
 	XAxis_bound.editor_only  = not XAxis_bound.editor_only
 	Origin_bound.editor_only = not Origin_bound.editor_only
@@ -356,7 +410,12 @@ func keypress_F3() -> void:
 ##
 func new_line() -> Line2D:
 	var line = Line2D.new()
-	line.width = 5
+	line.width = 1
+	line.default_color = Color8(
+		0x80, # red
+		0x80, # green
+		0x80  # blue
+		)
 	return line
 
 
@@ -375,6 +434,7 @@ func new_grid_line() -> Line2D:
 		0x80  # alpha
 		)
 	return line
+
 
 ##
 ## \brief Label the grid lines
@@ -435,7 +495,6 @@ func make_grid_labels(axes : Axes) -> void:
 		y_labels[i].rect_position = Vector2(ylabel_left - label_width, ylabel_top)
 
 
-
 ##
 ## \brief Make the grid line artwork
 ##
@@ -481,6 +540,7 @@ func make_grid_lines() -> void:
 		y_divisions[i].add_point(Vector2(xO + xstart, yO + yG))
 		y_divisions[i].add_point(Vector2(xO + xstop, yO + yG))
 
+
 ##
 ## \brief Define X and Y axes
 ##
@@ -502,10 +562,13 @@ func make_axes() -> Axes:
 	axes.y.directed_length = 400
 	return axes
 
+
 ##
 ## \brief Make the data and the data line artwork
 ##
-func make_data_lines() -> void:
+## This is for testing the interface without any data.
+##
+func make_dancing_lines() -> void:
 	var lines : Array = []
 	for i in range(2):
 		## Make a new line.
@@ -526,17 +589,66 @@ func make_data_lines() -> void:
 
 
 ##
+## \brief Make fake data
+##
+## This is for testing the interface with made up data.
+##
+func fake_data() -> PoolVector2Array:
+	var data := PoolVector2Array()
+	# Some x ranges to try
+	# var x_data := range(1,100+1)
+	# var x_data := range(100,1-1,-1)
+	var x_data := range(666,999+1)
+	# var x_data := range(999,666-1,-1)
+	for x in x_data:
+		var y = 666*(x%66) + 6666
+		data.append(Vector2(x,y))
+	return data
+
+
+func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
+	var d : Dictionary = myu.unzip(data)
+	var data_x := PoolRealArray(d["x"])
+	var data_y := PoolRealArray(d["y"])
+	var distances := Array()
+	for x in data_x:
+		distances.append(abs(x - data_mouse.x))
+	var index_of_closest_x : int = distances.find(distances.min())
+	return Vector2(
+		data_x[index_of_closest_x],
+		data_y[index_of_closest_x] # data_mouse.y
+		)
+
+
+##
 ## \brief Display mouse coordinates in HudRight
 ##
-func HudRight_write_text() -> void:
+func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
 	# Updates strings
 	HudRight.GlobalMouse = get_global_mouse_position()
-	HudRight.LocalMouse = Data_area.get_local_mouse_position()
+	var local_mouse : Vector2 = Data_area.get_local_mouse_position()
+	HudRight.LocalMouse = local_mouse
+	var data_mouse : Vector2 = xfmToData.xform(local_mouse)
+	# Restrict mouse data coordinates to one decimal place
+	HudRight.DataMouse = "({x}, {y})".format({
+		"x":String(data_mouse.x).pad_decimals(1),
+		"y":String(data_mouse.y).pad_decimals(1)
+		})
+	var value_mouse : Vector2 = data_nearest_to_mouse(data_mouse, data)
+	HudRight.ValueMouse = value_mouse
 
 	# Combine into one string
-	HudRight.text = "GLOBAL MOUSE: {GlobalMouse}\nLOCAL MOUSE: {LocalMouse}".format({
+	HudRight.text = """MOUSE COORDINATES
+---< Pixel Coordinates >---
+GLOBAL: {GlobalMouse}
+ LOCAL: {LocalMouse}
+---< Data Coordinates >---
+  AXES: {DataMouse}
+ VALUE: {ValueMouse} (data value closest to mouse)""".format({
 		"GlobalMouse":HudRight.GlobalMouse,
-		"LocalMouse":HudRight.LocalMouse
+		"LocalMouse":HudRight.LocalMouse,
+		"DataMouse":HudRight.DataMouse,
+		"ValueMouse":HudRight.ValueMouse
 		})
 
 

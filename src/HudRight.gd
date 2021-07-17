@@ -1,8 +1,10 @@
 extends Label
 
 
-var GlobalMouse : String
-var LocalMouse : String
+var GlobalMouse: String
+var LocalMouse:  String
+var DataMouse:   String
+var ValueMouse:  String
 
 func _ready():
 	valign = Label.VALIGN_TOP

@@ -50,3 +50,29 @@ func report_size_and_position(control : Control) -> String:
 		"gap3":" ".repeat(13 - pos.length())
 		})
 	return msg
+
+#
+# \brief Convert a PoolVector2Array into separate x and y arrays
+#
+# \param data: The PoolVector2Array to convert into separate x
+# and y arrays.
+#
+# \return Dictionary with the x and y arrays.
+#
+# Usage:
+#
+# ```
+# var d : Dictionary = unzip(data)
+# var x : Array = d["x"]
+# var y : Array = d["y"]
+# ```
+#
+func unzip(data : PoolVector2Array) -> Dictionary:
+	# Split PoolVector2Array into two arrays
+	var x := Array()
+	var y := Array()
+	for d in data:
+		x.append(d.x)
+		y.append(d.y)
+	return {"x":x, "y":y}
+
