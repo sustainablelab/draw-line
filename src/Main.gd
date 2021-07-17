@@ -46,11 +46,14 @@ onready var Title:        Label           = get_node("App/Plot_area/PlotParts/Ti
 onready var Title_bound:  ReferenceRect   = get_node("App/Plot_area/PlotParts/Title_area/Title_bound")
 onready var Y1Axis_area:  MarginContainer = get_node("App/Plot_area/PlotParts/Y1Axis_area")
 onready var Y1Axis_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Y1Axis_area/Y1Axis_bound")
+onready var Y2Axis_area:  MarginContainer = get_node("App/Plot_area/PlotParts/Y2Axis_area")
+onready var Y2Axis_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Y2Axis_area/Y2Axis_bound")
 onready var Data_area:    MarginContainer = get_node("App/Plot_area/PlotParts/Data_area")
 onready var Data_bound:   ReferenceRect   = get_node("App/Plot_area/PlotParts/Data_area/Data_bound")
 onready var XAxis_area:   MarginContainer = get_node("App/Plot_area/PlotParts/XAxis_area")
 onready var XAxis_bound:  ReferenceRect   = get_node("App/Plot_area/PlotParts/XAxis_area/XAxis_bound")
-onready var Origin_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Origin_bound")
+onready var Origin_area:  MarginContainer = get_node("App/Plot_area/PlotParts/Origin_area")
+onready var Origin_bound: ReferenceRect   = get_node("App/Plot_area/PlotParts/Origin_area/Origin_bound")
 onready var KeyPress:     Label           = get_node("App/KeyPress")
 
 
@@ -125,7 +128,7 @@ func _ready() -> void:
 	## number of children in `PlotParts` by `PlotParts.columns`.
 
 	# Rows in GridContainer PlotParts is num children / columns 
-	PlotParts.columns = 2
+	PlotParts.columns = 3
 
 	##
 	## **Children of `PlotParts`**
@@ -134,20 +137,26 @@ func _ready() -> void:
 	##
 	## - *Title*: plot title above the data
 	##
+	## - *UpRight*: dead space in the upper-right corner of the plot area
+	##
 	## - *Y1Axis*: the Y-axis to the left of the data
 	##
 	## - *Data*: draw plot lines here
 	##
+	## - *Y2Axis*: the Y-axis to the right of the data
+	##
 	## - *Origin*: dead space in the lower-left corner of the plot area
 	##
 	## - *XAxis*: the X-axis
+	##
+	## - *DownRight*: dead space in the lower-right corner of the plot area
 
 	##
 	## **Node Data_area**
 	##
 
-	## `Data_area` shall expand horizontally and vertically to claim
-	## maximum space for plot artwork.
+	## `Data_area` shall expand horizontally and vertically to
+	## claim maximum space for plot artwork.
 	Data_area.size_flags_horizontal = SIZE_EXPAND_FILL
 	Data_area.size_flags_vertical = SIZE_EXPAND_FILL
 
@@ -155,42 +164,86 @@ func _ready() -> void:
 	Data_bound.editor_only = false
 	Data_bound.border_color = Color8(0x80, 0xFF, 0x80, 0x80)
 
+	##
+	## **Node Title_area**
+	##
 
 	## `Title_bound` shows the bounds of `Title_area`.
 	Title_bound.editor_only = false
 	Title_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
 
-	## Use Y1Axis_area to set width Y1-axis
-	Y1Axis_area.rect_min_size = Vector2(100,0)
-	## Use Y1Axis_bound to visualize space for the Y1-axis
+	##
+	## **Node Y1Axis_area**
+	##
+
+	## `Y1Axis_area` sets the width of the Y-Axis to the left of the data.
+	Y1Axis_area.rect_min_size = Vector2(50,0)
+
+	## `Y1Axis_bound` shows the bounds of `Y1Axis_area`.
 	Y1Axis_bound.editor_only = false
 	Y1Axis_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
 
-	# Use XAxis_area to block off space for the X axis
+	##
+	## **Node Y2Axis_area**
+	##
+
+	## `Y2Axis_area` sets the width of the Y-Axis to right of the data.
+	Y2Axis_area.rect_min_size = Vector2(50,0)
+
+	## `Y2Axis_bound` shows the bounds of `Y2Axis_area`.
+	Y2Axis_bound.editor_only = false
+	Y2Axis_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
+
+	##
+	## **Node XAxis_area**
+	##
+
+	## `XAxis_area` sets the height of the X-Axis.
 	XAxis_area.rect_min_size = Vector2(0,20)
 	XAxis_area.size_flags_horizontal = SIZE_EXPAND_FILL
-	# Use XAxis_bound to visualize space for the X axis
+
+	## `XAxis_bound` shows the bounds of the `XAxis_area`.
 	XAxis_bound.editor_only = false
 	XAxis_bound.border_color = Color8(0x40, 0x80, 0xFF, 0x80)
 
-	# Use Origin_bound to block off dead space under the Y1Axis
-	Origin_bound.rect_min_size = Vector2(
+	##
+	## **Node Origin_area**
+	##
+
+	## `Origin_area` is required by `PlotParts` for setting the
+	## number of rows. `Origin_area` blocks off the dead space
+	## under the Y axis and left of the X axis.
+	Origin_area.rect_min_size = Vector2(
 		Y1Axis_area.rect_min_size.x,
 		XAxis_area.rect_min_size.y
 		)
-	# Use Origin_bound to visualize the dead space under the Y1Axis
+
+	## `Origin_bound` shows the bounds of `Origin_area`.
 	Origin_bound.editor_only = false
 	Origin_bound.border_color = Color8(0xFF, 0xFF, 0xFF, 0x80)
 
-	# Use UpLeft_area to block off dead space above the Y1Axis
+	##
+	## **Node UpLeft_area**
+	##
+
+	## `UpLeft_area` is required by `PlotParts` for setting the
+	## number of rows. `UpLeft_area` blocks off dead space above
+	## the Y axis and left of the plot title.
 	UpLeft_area.rect_min_size = Vector2(
 		Y1Axis_area.rect_min_size.x,
 		Title_area.rect_size.y
 		)
-	# Use UpLeft_bound to visualize the dead space above the Y1Axis.
+
+	## `UpLeft_bound` shows the bounds of `UpLeft_area`.
 	UpLeft_bound.editor_only = false
 	UpLeft_bound.border_color = Color8(0xFF, 0xFF, 0xFF, 0x80)
 
+	##
+	## **Node Dev**
+	##
+
+	## Start with all Developer art (bounding boxes) invisible. F3
+	## toggles visibility.
 	Dev.visible = false
 
 	# ---< DEBUG >---
@@ -214,7 +267,7 @@ func _process(_delta) -> void:
 	## Title the plot.
 	Title.text = "PUT PLOT TITLE IN Title.text"
 
-	## Draw lines.
+	# ---< Draw lines >---
 
 	# Free all lines
 	global_data_art.free()
@@ -226,50 +279,18 @@ func _process(_delta) -> void:
 	Data_area.add_child(global_data_art)
 	Data_area.add_child(global_grid_art)
 
-	## Make the axes.
-	var xAxis := Axis.new()
-	var yAxis := Axis.new()
-	var axes := Axes.new(xAxis, yAxis, global_pan_offset)
-	# TEMP -- shall come from data
-	axes.x.first = 123
-	axes.x.directed_length = 100
-	axes.y.first = 456
-	axes.y.directed_length = 400
-
-	## Make the grid line artwork.
+	## Make the X- and Y-axis **grid line** artwork.
 	make_grid_lines()
-	## Make the tick label artwork.
+
+	## Define the axes:
+	## X and Y ranges and an offset into those ranges.
+	var axes : Axes = make_axes()
+
+	## Make the X- and Y-axis **tick label** artwork.
 	make_grid_labels(axes)
 
 	## Make the data and the data line artwork.
 	make_data_lines()
-
-
-
-##
-## \brief Create a line with default width
-##
-func new_line() -> Line2D:
-	var line = Line2D.new()
-	line.width = 5
-	return line
-
-
-##
-## \brief Create a grid line
-##
-func new_grid_line() -> Line2D:
-	var line = Line2D.new()
-	## Make grid lines skinny.
-	line.width = 1
-	## Make grid lines dark green and transparent.
-	line.default_color = Color8(
-		0x40, # red
-		0x80, # green
-		0x40, # blue
-		0x80  # alpha
-		)
-	return line
 
 
 # --------------
@@ -331,6 +352,31 @@ func keypress_F3() -> void:
 # ------------------
 
 ##
+## \brief Create a line with default width
+##
+func new_line() -> Line2D:
+	var line = Line2D.new()
+	line.width = 5
+	return line
+
+
+##
+## \brief Create a grid line
+##
+func new_grid_line() -> Line2D:
+	var line = Line2D.new()
+	## Make grid lines skinny.
+	line.width = 1
+	## Make grid lines dark green and transparent.
+	line.default_color = Color8(
+		0x40, # red
+		0x80, # green
+		0x40, # blue
+		0x80  # alpha
+		)
+	return line
+
+##
 ## \brief Label the grid lines
 ##
 ## \param axes: The axes for the current "view" of the data.
@@ -338,14 +384,14 @@ func keypress_F3() -> void:
 func make_grid_labels(axes : Axes) -> void:
 	var x_labels : Array = []
 	var y_labels : Array = []
-	# x_labels all have the same TOP coordinate
-	var xlabel_top : float = XAxis_area.rect_position.y
-	# y_labels all have the same LEFT coordinate
-	var ylabel_left : float = Y1Axis_area.rect_position.x
 	var axis_size := Vector2( # TEMP
 		Data_area.rect_size.x,
 		Data_area.rect_size.y
 		)
+	# x_labels all have the same TOP coordinate
+	var xlabel_top : float = axis_size.y + 5 # see ystart
+	# y_labels all have the same LEFT coordinate
+	var ylabel_left : float = -5 # see xstart
 	# tick step (axis value step-size between ticks)
 	var xtick_step : float = axes.x.directed_length/(n_xticks-1)
 	var xtick_pitch : float = axis_size.x/(n_xticks-1)
@@ -356,8 +402,6 @@ func make_grid_labels(axes : Axes) -> void:
 		# Make a new label
 		x_labels.append(Label.new())
 		global_grid_art.add_child(x_labels[i])
-		# Center-align x labels 
-		x_labels[i].align = Label.ALIGN_CENTER
 		# Calculate the value to show in the label
 		var xA : float = axes.x.first + i*xtick_step
 		# Show ints as ints, show floats with one decimal place
@@ -365,13 +409,31 @@ func make_grid_labels(axes : Axes) -> void:
 			x_labels[i].text = String(xA).pad_decimals(0)
 		else:
 			x_labels[i].text = String(xA).pad_decimals(1)
-		# Position the label based on its width
-		var label_w : float = x_labels[i].rect_size.x
-		var xlabel_left : float = XAxis_area.rect_position.x - label_w/2 + i*xtick_pitch
+		# Position the label based on its width.
+		# Guess the width based on the number of characters and
+		# the font height.
+		var label_font_height : float = x_labels[i].get_line_height()
+		var label_char_count : int = x_labels[i].get_total_character_count()
+		var label_half_width : float = label_char_count*label_font_height/4
+		var xlabel_left : float = i*xtick_pitch - label_half_width
 		x_labels[i].rect_position = Vector2(xlabel_left, xlabel_top)
-	# for i in range(n_yticks):
-	# 	y_labels.append(Label.new())
-	# 	y_labels[i].align = Label.ALIGN_RIGHT
+	for i in range(n_yticks):
+		# Make a new label
+		y_labels.append(Label.new())
+		global_grid_art.add_child(y_labels[i])
+		# Calculate the value to show in the label
+		var yA : float = axes.y.first + i*ytick_step
+		# Show ints as ints, show floats with one decimal place
+		if yA - int(yA) == 0:
+			y_labels[i].text = String(yA).pad_decimals(0)
+		else:
+			y_labels[i].text = String(yA).pad_decimals(1)
+		var label_font_height : float = y_labels[i].get_line_height()
+		var ylabel_top : float = axis_size.y - i*ytick_pitch - label_font_height/2
+		var label_char_count : int = y_labels[i].get_total_character_count()
+		var label_width : float = label_char_count*label_font_height/2
+		y_labels[i].rect_position = Vector2(ylabel_left - label_width, ylabel_top)
+
 
 
 ##
@@ -419,6 +481,26 @@ func make_grid_lines() -> void:
 		y_divisions[i].add_point(Vector2(xO + xstart, yO + yG))
 		y_divisions[i].add_point(Vector2(xO + xstop, yO + yG))
 
+##
+## \brief Define X and Y axes
+##
+## Each Axis has a `first` value and a `directed_length`.
+## Axes are an X Axis and a Y Axis together with an (x,y) offset
+## into the axes. The offset adds to the `first` value. The
+## `directed_length is unchanged, so all values are offset by the
+## offset.
+##
+func make_axes() -> Axes:
+	## Make the axes.
+	var xAxis := Axis.new()
+	var yAxis := Axis.new()
+	var axes := Axes.new(xAxis, yAxis, global_pan_offset)
+	# TEMP -- shall come from data
+	axes.x.first = 99
+	axes.x.directed_length = 100
+	axes.y.first = 456
+	axes.y.directed_length = 400
+	return axes
 
 ##
 ## \brief Make the data and the data line artwork
@@ -471,8 +553,9 @@ func HudLeft_write_text() -> void:
 	HudLeft.Title_area = myu.report_size_and_position(Title_area)
 	HudLeft.Title = myu.report_size_and_position(Title)
 	HudLeft.Y1Axis_area = myu.report_size_and_position(Y1Axis_area)
+	HudLeft.Y2Axis_area = myu.report_size_and_position(Y2Axis_area)
 	HudLeft.Data_area = myu.report_size_and_position(Data_area)
-	HudLeft.Origin_bound = myu.report_size_and_position(Origin_bound)
+	HudLeft.Origin_area = myu.report_size_and_position(Origin_area)
 	HudLeft.XAxis_area  = myu.report_size_and_position(XAxis_area)
 	HudLeft.KeyPress = myu.report_size_and_position(KeyPress)
 	HudLeft.HudLeft = myu.report_size_and_position(HudLeft)
@@ -487,8 +570,9 @@ func HudLeft_write_text() -> void:
 {Title_area}
 {Title}
 {Y1Axis_area}
+{Y2Axis_area}
 {Data_area}
-{Origin_bound}
+{Origin_area}
 {XAxis_area}
 {KeyPress}
 {HudLeft}
@@ -501,8 +585,9 @@ func HudLeft_write_text() -> void:
 		"Title_area":HudLeft.Title_area,
 		"Title":HudLeft.Title,
 		"Y1Axis_area":HudLeft.Y1Axis_area,
+		"Y2Axis_area":HudLeft.Y2Axis_area,
 		"Data_area":HudLeft.Data_area,
-		"Origin_bound":HudLeft.Origin_bound,
+		"Origin_area":HudLeft.Origin_area,
 		"XAxis_area":HudLeft.XAxis_area,
 		"KeyPress":HudLeft.KeyPress,
 		"HudLeft":HudLeft.HudLeft,

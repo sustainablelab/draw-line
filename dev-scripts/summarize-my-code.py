@@ -119,11 +119,18 @@ def get_section_names(code_filepath: pathlib.Path) -> list:
 
     return section_names
 
+def is_comment(line:str) -> bool:
+    return (line.strip().startswith("#"))
+
+def is_blank(line:str) -> bool:
+    return(line == "\n")
+
 def get_length(code_filepath: pathlib.Path) -> int:
     nlines = 0
     with code_filepath.open() as f:
         for line in f:
-            nlines += 1
+            if not is_comment(line) and not is_blank(line):
+                nlines += 1
     return nlines
 
 def create_main_summary(code_filepath: pathlib.Path) -> str:
@@ -191,7 +198,7 @@ if __name__ == '__main__':
     with my_summary.open("w", encoding="utf-8") as o:
         o.write(f"""# File Summary
 
-   type |  GDScript file  | nlines | details
+   type |  GDScript file  |   LOC  | details
 ------- | --------------- | ------ | -------
 """)
         my_code_files = list(src.glob("*.gd"))

@@ -16,19 +16,19 @@ __meta__ = {
 
 [node name="App" type="VBoxContainer" parent="."]
 margin_right = 4.0
-margin_bottom = 56.0
+margin_bottom = 68.0
 
 [node name="Plot_area" type="MarginContainer" parent="App"]
 margin_right = 4.0
-margin_bottom = 36.0
+margin_bottom = 48.0
 
 [node name="Plot_bound" type="ReferenceRect" parent="App/Plot_area"]
 margin_right = 4.0
-margin_bottom = 36.0
+margin_bottom = 48.0
 
 [node name="PlotParts" type="GridContainer" parent="App/Plot_area"]
 margin_right = 4.0
-margin_bottom = 36.0
+margin_bottom = 48.0
 
 [node name="UpLeft_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
 
@@ -44,37 +44,57 @@ margin_bottom = 16.0
 [node name="Title_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/Title_area"]
 margin_bottom = 16.0
 
-[node name="Y1Axis_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
+[node name="UpRight_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
 margin_top = 24.0
 margin_bottom = 24.0
+
+[node name="UpRight_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/UpRight_area"]
+
+[node name="Y1Axis_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
+margin_top = 28.0
+margin_bottom = 28.0
 
 [node name="Y1Axis_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/Y1Axis_area"]
 
 [node name="Data_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
-margin_top = 28.0
-margin_bottom = 28.0
-
-[node name="Data_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/Data_area"]
-
-[node name="Origin_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts"]
 margin_top = 32.0
 margin_bottom = 32.0
 
-[node name="XAxis_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
+[node name="Data_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/Data_area"]
+
+[node name="Y2Axis_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
 margin_top = 36.0
 margin_bottom = 36.0
 
+[node name="Y2Axis_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/Y2Axis_area"]
+
+[node name="Origin_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
+margin_top = 40.0
+margin_bottom = 40.0
+
+[node name="Origin_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/Origin_area"]
+
+[node name="XAxis_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
+margin_top = 44.0
+margin_bottom = 44.0
+
 [node name="XAxis_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/XAxis_area"]
 
+[node name="DownRight_area" type="MarginContainer" parent="App/Plot_area/PlotParts"]
+margin_top = 48.0
+margin_bottom = 48.0
+
+[node name="DownRight_bound" type="ReferenceRect" parent="App/Plot_area/PlotParts/DownRight_area"]
+
 [node name="KeyPress" parent="App" instance=ExtResource( 2 )]
-margin_top = 40.0
+margin_top = 52.0
 margin_right = 4.0
-margin_bottom = 56.0
+margin_bottom = 68.0
 size_flags_vertical = 1
 
 [node name="Dev" type="HBoxContainer" parent="."]
 margin_right = 4.0
-margin_bottom = 56.0
+margin_bottom = 68.0
 
 [node name="HudLeft" type="Label" parent="Dev"]
 margin_bottom = 16.0
@@ -84,8 +104,8 @@ script = ExtResource( 4 )
 
 [node name="HudRight" type="Label" parent="Dev"]
 margin_left = 4.0
-margin_top = 20.0
+margin_top = 26.0
 margin_right = 4.0
-margin_bottom = 36.0
+margin_bottom = 42.0
 custom_styles/normal = ExtResource( 6 )
 script = ExtResource( 5 )
