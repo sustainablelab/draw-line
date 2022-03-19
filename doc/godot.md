@@ -1,3 +1,7 @@
+[Back to top-level README](../README.md#ToC)
+
+All of my Godot knowledge lives here.
+
 ## ToC
 - [Basic setup for any application](godot.md#basic-setup-for-any-application)
 - [Splitting code cross files](godot.md#splitting-code-cross-files)
