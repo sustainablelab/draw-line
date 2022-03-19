@@ -40,6 +40,7 @@ Until then...
 On this page:
 
 - [Status](README.md#status)
+- [Next steps](README.md#next-steps)
 - [Why did I make this](README.md#why-did-i-make-this)
 
 Other docs (these are in the `doc` folder):
@@ -87,6 +88,15 @@ any other application, or maximizing the window) resizes the plot
 area:
 
 ![resize window](doc/img/early-demo-resize-plot-area.PNG)
+
+## Next steps
+
+- [ ] mouse zoom/pan control
+- [ ] open a file browser to load data from file
+- [ ] plot multiple plots
+- [ ] do math on plot data
+    - [ ] generate statistics
+    - [ ] find area under the plot
 
 ## Why did I make this
 
