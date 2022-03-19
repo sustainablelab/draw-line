@@ -16,19 +16,22 @@
     Main.gd: 344 lines
 
 Read Main.gd by starting at the `_ready()` callback on line
-67.
+71.
 
 All drawing happens in the `_process()` callback on line
-267.
+271.
 
 ## Table of Contents
 
-- [4 : Globals](Main.md#globals)
-- [61 : Setup](Main.md#setup)
-- [261 : Draw](Main.md#draw)
-- [354 : User Input](Main.md#user-input)
-- [386 : KeyPress Functions](Main.md#keypress-functions)
-- [412 : Draw functions](Main.md#draw-functions)
+- [8 : Globals](Main.md#globals)
+- [65 : Setup](Main.md#setup)
+- [265 : Draw](Main.md#draw)
+- [358 : User Input](Main.md#user-input)
+- [390 : KeyPress Functions](Main.md#keypress-functions)
+- [416 : Draw functions](Main.md#draw-functions)
+
+**Repository:**
+https://github.com/sustainablelab/draw-line
 
 ## Globals
 
@@ -115,7 +118,7 @@ artwork.
 > **Application Setup**
 >
 
-    67 : func _ready() -> void:
+    71 : func _ready() -> void:
 
 Randomize the seed for Godot's random number generator.
 Say hello.
@@ -216,7 +219,7 @@ the Y axis and left of the plot title.
 > **Application Loop**
 >
 
-    267 : func _process(_delta) -> void:
+    271 : func _process(_delta) -> void:
 
 
 **Draw plot artwork**
@@ -243,14 +246,14 @@ Write text to HUD text overlay.
 > *\return Transform2D matrix*
 >
 
-    338 : func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
+    342 : func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
 
 ## User Input
 
 > **Handle keyboard input**
 >
 
-    360 : func _input(event) -> void:
+    364 : func _input(event) -> void:
 
 Esc quits.
 F1 toggles bounding boxes.
@@ -261,26 +264,26 @@ F3 toggles HudRight text overlay.
 > **Quit when user presses Esc**
 >
 
-    392 : func keypress_esc() -> void:
+    396 : func keypress_esc() -> void:
 
 
 > **Toggle bounding boxes when user presses F1**
 >
 
-    400 : func keypress_F1() -> void:
+    404 : func keypress_F1() -> void:
 
 ## Draw functions
 
 > **Create a line with default width**
 >
 
-    418 : func new_line() -> Line2D:
+    422 : func new_line() -> Line2D:
 
 
 > **Create a grid line**
 >
 
-    432 : func new_grid_line() -> Line2D:
+    436 : func new_grid_line() -> Line2D:
 
 Make grid lines skinny.
 Make grid lines dark green and transparent.
@@ -290,13 +293,13 @@ Make grid lines dark green and transparent.
 > *\param axes: The axes for the current "view" of the data.*
 >
 
-    451 : func make_grid_labels(axes : Axes) -> void:
+    455 : func make_grid_labels(axes : Axes) -> void:
 
 
 > **Make the grid line artwork**
 >
 
-    508 : func make_grid_lines() -> void:
+    512 : func make_grid_lines() -> void:
 
 Make a new line.
 Draw a line for each tick on the XAxis.
@@ -312,7 +315,7 @@ Draw a line for each tick on the XAxis.
 > *offset.*
 >
 
-    560 : func make_axes() -> Axes:
+    564 : func make_axes() -> Axes:
 
 Make the axes.
 
@@ -321,7 +324,7 @@ Make the axes.
 > *This is for testing the interface without any data.*
 >
 
-    580 : func make_dancing_lines() -> void:
+    584 : func make_dancing_lines() -> void:
 
 Make a new line.
 Randomize its color.
@@ -332,22 +335,22 @@ Randomize the points in the line.
 > *This is for testing the interface with made up data.*
 >
 
-    605 : func fake_data() -> PoolVector2Array:
+    609 : func fake_data() -> PoolVector2Array:
 
 
-    618 : func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
+    622 : func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
 
 
 > **Display mouse coordinates in HudRight**
 >
 
-    635 : func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
+    639 : func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
 
 
 > **Report size and position of Nodes in HudLeft**
 >
 
-    667 : func HudLeft_write_text() -> void:
+    671 : func HudLeft_write_text() -> void:
 
 
 bob
