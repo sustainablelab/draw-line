@@ -1,3 +1,16 @@
+## ToC
+- [Basic setup for any application](godot.md#basic-setup-for-any-application)
+- [Splitting code cross files](godot.md#splitting-code-cross-files)
+- [Show me key presses at lower right of screen](godot.md#show-me-key-presses-at-lower-right-of-screen)
+- [Draw a line](godot.md#draw-a-line)
+- [Draw lots of lines](godot.md#draw-lots-of-lines)
+- [Make the lines act like they are part of the GUI](godot.md#make-the-lines-act-like-they-are-part-of-the-gui)
+- [Mark the drawing area](godot.md#mark-the-drawing-area)
+- [Setup Scene Tree for a text overlay](godot.md#setup-scene-tree-for-a-text-overlay)
+- [Use resized signal to find out positions and sizes](godot.md#use-resized-signal-to-find-out-positions-and-sizes)
+- [Overlay text](godot.md#overlay-text)
+- [Use a Left and Right HUD](godot.md#use-a-left-and-right-hud)
+
 # Goal: draw a line on the screen
 
 ## Basic setup for any application
@@ -74,6 +87,8 @@ Godot realizes the node is orphaned and I get the error. The
 error is invisible unless someone is reading the messages printed
 to stderr (the terminal where Godot was launched from).
 
+## Splitting code cross files
+
 Why put my utility functions in a scene?
 
 - I cannot attach `MyUtilities.gd` to node `Main`
@@ -131,6 +146,8 @@ This is likely to change in Godot v4.0, but for now, the script
 that defines the `Axis` class cannot reference the `Axis` class.
 Doing so results in lots of memory leak error messages.
 
+## Show me key presses at lower right of screen
+
 Main is a `VBoxContainer` because I like to see my key presses in
 the lower-right corner of the screen. Here is the setup.
 
@@ -162,6 +179,8 @@ This pushes the Label to the lower right corner of the
 application window and auto-adjusts as the window size is
 changed. Actually, it does nothing at the moment. We need two
 things to let the resizing behavior take effect.
+
+### Size flags and anchors
 
 First, we need something in the VBox above with size flags that
 tell it to fill the rest of the window. Use `ReferenceRect` for
@@ -204,6 +223,8 @@ func _ready() -> void:
 At this point, the `KeyPress` text sticks to the bottom right
 of the window as the window is resized and the placeholder fills
 all the remaining space.
+
+### Scene Tree so far
 
 The Scene Tree is
 
@@ -369,7 +390,7 @@ func new_line() -> Line2D:
 	return line
 ```
 
-## But the lines are not part of the GUI yet
+## Make the lines act like they are part of the GUI
 
 The lines are drawn to specific screen coordinates. They are not
 clipped, they do not reposition, they do not rescale as the
@@ -642,7 +663,11 @@ func _ready():
 ```
 
 There are automated ways to set up monitoring values in the text
-overlay. For now I am keeping it simple, manually adding
+overlay. See:
+
+    https://kidscancode.org/godot_recipes/ui/debug_overlay/
+
+For now I am keeping it simple, manually adding
 information and doing basic formatting for a clean presentation.
 
 I make a `String` variable for each Node I want to monitor. I
