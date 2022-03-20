@@ -1,21 +1,24 @@
 [Back to top-level README](../README.md#ToC)
 
-Read this doc to learn convenient ways to launch Godot and to
-launch the game from the cmdline. After that, start developing!
+1. Read this doc to learn convenient ways to launch Godot and to
+   launch the game from the cmdline.
+2. After that, start developing!
 
-To get started developing:
-
-- jump directly to [Main.md](../src/dev-view-src/Main.md) (the
-  documentation for the **main GDScript**: `Main.gd`)
-- the documentation for `Main.gd` starts with:
-    - a [table summarizing the source files](../src/dev-view-src/Main.md#file-summary) in the
-  project
-    - [where to look](../src/dev-view-src/Main.md#summary) in
-      `Main.gd` to get started understanding the code
-
-While reading the code, it is useful to refer to
-[doc/godot.md](godot.md). This is where I store all of my
-knowledge about Godot.
+- To get started developing:
+    - jump directly to [Main.md](../src/dev-view-src/Main.md) (the
+      documentation for the **main GDScript**: `Main.gd`)
+    - the documentation for `Main.gd` starts with:
+        - a [table summarizing the source
+          files](../src/dev-view-src/Main.md#file-summary) in
+          the project
+            - the table shows the number of *lines of code* (**LOC**)
+              for each source file (`Main.gd` is the only one
+              long enough to need a summary)
+        - [where to look](../src/dev-view-src/Main.md#summary) in
+          `Main.gd` to get started understanding the code
+- While reading the code, it is useful to refer to
+  [doc/godot.md](godot.md). This is where I store all of my
+  knowledge about Godot.
 
 # Getting Started
 

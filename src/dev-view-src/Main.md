@@ -19,16 +19,18 @@ Read Main.gd by starting at the `_ready()` callback on line
 71.
 
 All drawing happens in the `_process()` callback on line
-287.
+239.
 
 ## Table of Contents
 
 - [8 : Globals](Main.md#globals)
 - [65 : Setup](Main.md#setup)
-- [281 : Draw](Main.md#draw)
-- [374 : User Input](Main.md#user-input)
-- [406 : KeyPress Functions](Main.md#keypress-functions)
-- [432 : Draw functions](Main.md#draw-functions)
+- [233 : Draw](Main.md#draw)
+- [300 : Data Transform Functions](Main.md#data-transform-functions)
+- [330 : User Input Functions](Main.md#user-input-functions)
+- [362 : KeyPress Functions](Main.md#keypress-functions)
+- [388 : Draw functions](Main.md#draw-functions)
+- [Class Summaries](Main.md#class-summaries)
 
 **Repository:**
 https://github.com/sustainablelab/draw-line
@@ -87,11 +89,14 @@ function:
 ### App
 #### Plot artwork
 **Free** and **remake** plot artwork on every iteration of
-`_process()`.
+`_process()`:
 
-Add lines (Line2D nodes) as children of `_art` Nodes to
-simplify memory management. Free `_art` to free all Line2D
-artwork.
+ - Simple memory management:
+
+   - add lines (Line2D nodes) as children of `_art` Nodes
+
+   - then simply free the `_art` Nodes to free all Line2D artwork
+
 #### Scene Tree
     App
     App/Plot_area
@@ -122,40 +127,56 @@ artwork.
 
 Randomize the seed for Godot's random number generator.
 
-Say hello: log "Enter the scene tree".
+Say hello: print main scene name and "Enter the scene tree"
 
 **Screen Layout**
 
-Put a dark background in the Window.
-Use `CanvasLayer` and `ColorRect`.
+ - **Dark Background**
 
-The layout shall fill the window and shall auto-resize
-when the user resizes the window.
-Use `ANCHOR_END`.
+   - Put a dark background in the Window.
 
-**Node Main**
+   - Use `CanvasLayer` and `ColorRect`.
 
-`Main` is divided into an `App` layer and a `Dev` overlay layer.
+ - **Auto resize**
 
-**Node App**
+   - layout shall fill the window
 
-`App` divides the screen into two rows: `Plot_area` and
-`KeyPress`.
+   - layout shall auto-resize when the user resizes the window
 
-**Node Plot_area**
+   - Use `ANCHOR_END`
 
-Node `Plot_area` shall expand and fill vertically. Intent is to
-push `KeyPress` to the screen bottom.
 
-**Show key presses at the bottom of the screen**
+ - **Root Node Main**
 
-Use `size_flags_vertical`: `SIZE_EXPAND_FILL`
-`Plot_bound` shows the bounds of `Plot_area`.
+   - `Main` is divided into child nodes `App` and `Dev`:
 
-**Node PlotParts**
+     - `App` is the main layer where I plot stuff
 
-`PlotParts` is a `GridContainer`. Godot determines the
-number of rows in the `GridContainer` by dividing the
+     - `Dev` is the overlay layer where I draw debug stuff
+
+ - **Main Child Node App**
+
+   - `App` divides the screen into two rows: `Plot_area` and `KeyPress`.
+
+ - **Node Plot_area**
+
+   - Node `Plot_area` shall expand and fill vertically.
+
+   - Intent is to push `KeyPress` to the screen bottom.
+
+   - Use `size_flags_vertical`: `SIZE_EXPAND_FILL`
+
+ - **Node Plot_bound**
+
+   - `Plot_bound` shows the bounds of `Plot_area`.
+
+
+ - **Node PlotParts**
+
+   - `PlotParts` is a `GridContainer`
+
+
+Godot determines the number of rows in the `GridContainer` by dividing the
 number of children in `PlotParts` by `PlotParts.columns`.
 
 `PlotParts` has 9 children and three columns:
@@ -172,107 +193,157 @@ number of children in `PlotParts` by `PlotParts.columns`.
 └───┴──────────────┴───┘
 ```
 
-**Children of `PlotParts`**
+ - **Children of `PlotParts`**
 
-- *UpLeft*: dead space in the upper-left corner of the plot area
+   - Row 1:
 
-- *Title*: plot title above the data
+     - *UpLeft*: dead space in the upper-left corner of the plot area
 
-- *UpRight*: dead space in the upper-right corner of the plot area
+     - *Title*: plot title above the data
 
-- *Y1Axis*: the Y-axis to the left of the data
+     - *UpRight*: dead space in the upper-right corner of the plot area
 
-- *Data*: draw plot lines here
+   - Row 2:
 
-- *Y2Axis*: the Y-axis to the right of the data
+     - *Y1Axis*: the Y-axis to the left of the data
 
-- *Origin*: dead space in the lower-left corner of the plot area
+     - *Data*: draw plot lines here
 
-- *XAxis*: the X-axis
+     - *Y2Axis*: the Y-axis to the right of the data
 
-- *DownRight*: dead space in the lower-right corner of the plot area
+   - Row 3:
 
-**Node Data_area**
+     - *Origin*: dead space in the lower-left corner of the plot area
 
-`Data_area` shall expand horizontally and vertically to
-claim maximum space for plot artwork.
-`Data_bound` shows the bounds of `Data_area`.
+     - *XAxis*: the X-axis
 
-**Node Title_area**
+     - *DownRight*: dead space in the lower-right corner of the plot area
 
-`Title_bound` shows the bounds of `Title_area`.
+ - **Node Data_area**
 
-**Node Y1Axis_area**
+   - `Data_area` shall expand horizontally and vertically to claim maximum space for plot artwork.
 
-`Y1Axis_area` sets the width of the Y-Axis to the left of the data.
-`Y1Axis_bound` shows the bounds of `Y1Axis_area`.
+   - `Data_bound` shows the bounds of `Data_area`.
 
-**Node Y2Axis_area**
+ - **Node Title_area**
 
-`Y2Axis_area` sets the width of the Y-Axis to right of the data.
-`Y2Axis_bound` shows the bounds of `Y2Axis_area`.
+   - `Title_bound` shows the bounds of `Title_area`
 
-**Node XAxis_area**
+ - **Node Y1Axis_area**
 
-`XAxis_area` sets the height of the X-Axis.
-`XAxis_bound` shows the bounds of the `XAxis_area`.
+   - `Y1Axis_area` sets the width of the Y-Axis to the left of the data.
 
-**Node Origin_area**
+   - `Y1Axis_bound` shows the bounds of `Y1Axis_area`.
 
-`Origin_area` is required by `PlotParts` for setting the
-number of rows. `Origin_area` blocks off the dead space
-under the Y axis and left of the X axis.
-`Origin_bound` shows the bounds of `Origin_area`.
+ - **Node Y2Axis_area**
 
-**Node UpLeft_area**
+   - `Y2Axis_area` sets the width of the Y-Axis to right of the data.
 
-`UpLeft_area` is required by `PlotParts` for setting the
-number of rows. `UpLeft_area` blocks off dead space above
-the Y axis and left of the plot title.
-`UpLeft_bound` shows the bounds of `UpLeft_area`.
+   - `Y2Axis_bound` shows the bounds of `Y2Axis_area`.
 
-**Node Dev**
+ - **Node XAxis_area**
+
+   - `XAxis_area` sets the height of the X-Axis.
+
+   - `XAxis_bound` shows the bounds of the `XAxis_area`.
+
+ - **Node Origin_area**
+
+   - `Origin_area` is required by `PlotParts` for setting the ## number of rows.
+
+   - `Origin_area` blocks off the dead space under the Y axis and left of the X axis.
+
+   - `Origin_bound` shows the bounds of `Origin_area`.
+
+ - **Node UpLeft_area**
+
+   - `UpLeft_area` is required by `PlotParts` for setting the number of rows.
+
+   - `UpLeft_area` blocks off dead space above the Y axis and left of the plot title.
+
+   - `UpLeft_bound` shows the bounds of `UpLeft_area`.
+
+
+ - **Main Child Node Dev**
+
+   - `Dev` contains the debug overlays `HudLeft` and `HudRight`.
+
+ - Start with HUD invisible.
+
+   - `F2` toggles left HUD visibility.
+
+   - `F3` toggles right HUD visibility.
 
 ## Draw
 
 > **Application Loop**
 >
 
-    287 : func _process(_delta) -> void:
+    239 : func _process(_delta) -> void:
 
 
 **Draw plot artwork**
 
-Title the plot.
-Free all old plot artwork by freeing the scene tree nodes.
-Allocate scene tree nodes for new plot artwork.
-Make the X- and Y-axis **grid line** artwork.
-Define the axes:
-Axes are X and Y ranges
-and the x,y offset into those ranges.
-Make the data and the data line artwork.
-Make the X- and Y-axis **tick label** artwork.
-Write text to HUD text overlay.
+ - Title the plot.
+
+ - Memory management:
+
+   - Free all old plot artwork by freeing the scene tree nodes.
+
+   - Allocate scene tree nodes for new plot artwork.
+
+ - Make the X- and Y-axis **grid line** artwork.
+
+ - Define the axes. Axes are:
+
+   - X and Y ranges
+
+   - the x,y offsets into those ranges
+
+ - Make the data and the data line artwork.
+
+   - Make some fake data to plot.
+
+   - Set axes based on data
+
+   - Transform data to screen coordinates:
+
+     - set up the Screen-to-Data matrix
+
+     - take its inverse
+
+   - Draw the plot artwork
+
+ - Make the X- and Y-axis **tick label** artwork.
+
+ - Write text to HUD text overlay.
+
+## Data Transform Functions
 
 > **Find the linear transformation matrix from screen to data**
 >
 > *Given a pixel in the plot, transform it to the data value*
 > *implied by the plot axes.*
 >
-> *\param axes: The current X and Y axes on the screen.*
-> *\param rect_size: The size of the area where data is plotted.*
+> **axes:**  The current X and Y axes on the screen.
 >
-> *\return Transform2D matrix*
+> **rect_size:**  The size of the area where data is plotted.
+>
+>
+> **Return:**
+>
+>    *Transform2D matrix*
+>
 >
 
-    358 : func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
+    314 : func transform_screen_to_data(axes : Axes, rect_size : Vector2) -> Transform2D:
 
-## User Input
+## User Input Functions
 
 > **Handle keyboard input**
 >
 
-    380 : func _input(event) -> void:
+    336 : func _input(event) -> void:
 
 Esc quits.
 F1 toggles bounding boxes.
@@ -283,42 +354,41 @@ F3 toggles HudRight text overlay.
 > **Quit when user presses Esc**
 >
 
-    412 : func keypress_esc() -> void:
+    368 : func keypress_esc() -> void:
 
 
 > **Toggle bounding boxes when user presses F1**
 >
 
-    420 : func keypress_F1() -> void:
+    376 : func keypress_F1() -> void:
 
 ## Draw functions
 
 > **Create a line with default width**
 >
 
-    438 : func new_line() -> Line2D:
+    394 : func new_line() -> Line2D:
 
 
 > **Create a grid line**
 >
 
-    452 : func new_grid_line() -> Line2D:
+    408 : func new_grid_line() -> Line2D:
 
-Make grid lines skinny.
-Make grid lines dark green and transparent.
 
 > **Label the grid lines**
 >
-> *\param axes: The axes for the current "view" of the data.*
+> **axes:**  The axes for the current "view" of the data.
+>
 >
 
-    471 : func make_grid_labels(axes : Axes) -> void:
+    427 : func make_grid_labels(axes : Axes) -> void:
 
 
 > **Make the grid line artwork**
 >
 
-    528 : func make_grid_lines() -> void:
+    484 : func make_grid_lines() -> void:
 
 Make a new line.
 Draw a line for each tick on the XAxis.
@@ -334,42 +404,48 @@ Draw a line for each tick on the XAxis.
 > *offset.*
 >
 
-    580 : func make_axes() -> Axes:
+    536 : func make_axes() -> Axes:
 
-Make the axes.
 
-> **Make the data and the data line artwork**
+> **Make dancing line data and line artwork**
 >
 > *This is for testing the interface without any data.*
 >
 
-    600 : func make_dancing_lines() -> void:
+    556 : func make_dancing_lines() -> void:
 
-Make a new line.
-Randomize its color.
-Randomize the points in the line.
 
 > **Make fake data**
 >
 > *This is for testing the interface with made up data.*
 >
 
-    625 : func fake_data() -> PoolVector2Array:
+    581 : func fake_data() -> PoolVector2Array:
 
 
-    638 : func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
+    594 : func data_nearest_to_mouse(data_mouse : Vector2, data : PoolVector2Array) -> Vector2:
 
 
 > **Display mouse coordinates in HudRight**
 >
 
-    655 : func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
+    611 : func HudRight_write_text(xfmToData : Transform2D, data : PoolVector2Array) -> void:
 
 
 > **Report size and position of Nodes in HudLeft**
 >
 
-    687 : func HudLeft_write_text() -> void:
+    643 : func HudLeft_write_text() -> void:
 
 
-bob
+# Class Summaries
+
+## Axes
+
+- TODO: write `create_class_summary()` in `summarize-my-code.py`
+
+
+## Axis
+
+- TODO: write `create_class_summary()` in `summarize-my-code.py`
+
