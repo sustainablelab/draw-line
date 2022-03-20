@@ -292,9 +292,9 @@ if __name__ == '__main__':
     # | Make the path to my summary |
     # -------------------------------
     # ▾ src/
-    #   ▾ dev-view-src/
+    #   ▾ markdown/
     #       Main.md
-    my_summary = src.joinpath("dev-view-src/Main.md")
+    my_summary = src.joinpath("markdown/Main.md")
     assert my_summary.parent.exists()
 
     # ------------------------------

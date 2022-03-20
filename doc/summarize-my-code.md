@@ -12,12 +12,12 @@ make
 Open the summary:
 
 ```
-vim dev-view-src/Main.md
+vim markdown/Main.md
 ```
 
 ## ToC
 
-- [Go to summary Main.md](../src/dev-view-src/Main.md)
+- [Go to summary Main.md](../src/markdown/Main.md)
 - [What is going on here](summarize-my-code.md#what-is-going-on-here)
 - [What the summarizing script looks for](summarize-my-code.md#what-the-summarizing-script-looks-for)
 
