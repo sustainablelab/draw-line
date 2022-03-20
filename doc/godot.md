@@ -188,7 +188,10 @@ things to let the resizing behavior take effect.
 
 First, we need something in the VBox above with size flags that
 tell it to fill the rest of the window. Use `ReferenceRect` for
-GUI placeholders.
+GUI placeholders. *Later, these `ReferenceRect` become the
+bounding boxes when I hit `F1` to toggle bounding boxes for
+debug, e.g. `Data_bound` is the bounding box for the
+`Data_area`.*
 
 - [x] add child `ReferenceRect` and name it `Placeholder`
 

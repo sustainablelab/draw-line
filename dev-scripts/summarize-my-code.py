@@ -48,7 +48,7 @@ def is_get_node(line:str) -> bool:
 def get_toc(code_filepath: pathlib.Path) -> list:
     toc = []
     line_num = 0
-    with code_filepath.open() as f:
+    with code_filepath.open(encoding="utf-8") as f:
         for line in f:
             line_num += 1
             if is_level1_name(line): # box: | name |
@@ -85,7 +85,7 @@ def get_section_names(code_filepath: pathlib.Path) -> list:
     line_num = 0
     part_of_multiline_func = False
     part_of_func_docstring = False
-    with code_filepath.open() as f:
+    with code_filepath.open(encoding="utf-8") as f:
         for line in f:
             line_num += 1
             if not is_doc_comment(line):
@@ -168,7 +168,7 @@ def is_blank(line:str) -> bool:
 
 def num_globals(code_filepath: pathlib.Path) -> int:
     nlines = 0
-    with code_filepath.open() as f:
+    with code_filepath.open(encoding="utf-8") as f:
         for line in f:
             # Ignore scene tree node global variables
             if is_global_var(line):
@@ -177,7 +177,7 @@ def num_globals(code_filepath: pathlib.Path) -> int:
 
 def get_length(code_filepath: pathlib.Path) -> int:
     nlines = 0
-    with code_filepath.open() as f:
+    with code_filepath.open(encoding="utf-8") as f:
         for line in f:
             if not is_comment(line) and not is_blank(line):
                 nlines += 1
@@ -228,7 +228,7 @@ def create_class_summary(code_filepath: pathlib.Path) -> str:
 def collect_globals(code_filepath: pathlib.Path) -> str:
     global_vars = []
     global_nodes = []
-    with code_filepath.open() as f:
+    with code_filepath.open(encoding="utf-8") as f:
         for line in f:
             if is_global_var(line):
                 global_vars.append(line)
@@ -285,7 +285,7 @@ if __name__ == '__main__':
         file_types = []
         details = []
         for my_code in my_code_files:
-            with my_code.open() as f:
+            with my_code.open(encoding="utf-8") as f:
                 line = "\n"
                 while is_blank(line) or is_comment(line):
                     line = next(f)

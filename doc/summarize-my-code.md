@@ -161,3 +161,62 @@ func _ready() -> void:
 Randomize the seed for Godot's random number generator.
 Say hello.
 ```
+
+### Look for scene tree
+
+- look for calls to `get_node("Node1/Node2")`
+    - these are the nodes the script assigns variables to (to
+      make it easy to access the node within the script)
+    - I can figure out the Scene Tree from the `get_node` calls
+    - *Example:*
+
+    ```gdscript
+    # ---< Scene Tree >---
+    onready var App:          VBoxContainer   = get_node("App")
+    onready var Plot_area:    MarginContainer = get_node("App/Plot_area")
+    onready var Plot_bound:   ReferenceRect   = get_node("App/Plot_area/Plot_bound")
+    onready var PlotParts:    GridContainer   = get_node("App/Plot_area/PlotParts")
+    onready var UpLeft_area:  MarginContainer = get_node("App/Plot_area/PlotParts/UpLeft_area")
+    ...
+    ```
+
+    - Here is how that shows up in my documentation:
+
+    ```markdown
+    #### Scene Tree
+    App
+    App/Plot_area
+    App/Plot_area/Plot_bound
+    App/Plot_area/PlotParts
+    App/Plot_area/PlotParts/UpLeft_area
+    ...
+    ```
+
+    - this corresponds to the scene tree visualization in the Godot editor:
+
+    ![scene tree in Godot
+    editor](img/scene-tree-in-godot-editor.PNG)
+
+    - the `Main` scene is the root node because the above code is
+      in `Main.gd` and `Main.gd` is the script attached to
+      `Main.tscn`
+- the `Dev` scene is a second root node
+    - I divide my code into `Main` and `Dev`, so there is a
+      `Scene Tree` for each
+    - Here is how it looks in the code:
+
+    ```gdscript
+    # ---< Scene Tree >---
+    onready var Dev:      HBoxContainer = get_node("Dev")
+    onready var HudLeft:  Label         = get_node("Dev/HudLeft")
+    onready var HudRight: Label         = get_node("Dev/HudRight")
+    ```
+
+    - and in the documentation:
+
+    ```markdown
+    #### Scene Tree
+        Dev
+        Dev/HudLeft
+        Dev/HudRight
+    ```

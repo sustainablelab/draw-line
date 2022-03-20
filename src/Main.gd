@@ -70,13 +70,14 @@ onready var KeyPress:     Label           = get_node("App/KeyPress")
 ##
 func _ready() -> void:
 	## Randomize the seed for Godot's random number generator.
+	##
 	randomize()
 
 	add_child(myu, true)
 	# Data_area.add_child(global_data_art, true)
 	# Data_area.add_child(global_grid_art, true)
 
-	## Say hello.
+	## Say hello: log "Enter the scene tree".
 	myu.log_to_stdout(filename, "Enter scene tree")
 
 	##
@@ -84,6 +85,7 @@ func _ready() -> void:
 	##
 
 	## Put a dark background in the Window.
+	## Use `CanvasLayer` and `ColorRect`.
 	var bgnd_layer := CanvasLayer.new()
 	bgnd_layer.layer = -1
 	var bgnd_color := ColorRect.new()
@@ -92,9 +94,10 @@ func _ready() -> void:
 	bgnd_color.color = Color8(0x14,0x14,0x13)
 	bgnd_layer.add_child(bgnd_color, true)
 	add_child(bgnd_layer, true)
-
-	## The layout shall fill the window and shall auto-resize when
-	## the user resizes the window.
+	##
+	## The layout shall fill the window and shall auto-resize
+	## when the user resizes the window.
+	## Use `ANCHOR_END`.
 	anchor_right = ANCHOR_END
 	anchor_bottom = ANCHOR_END
 
@@ -107,20 +110,20 @@ func _ready() -> void:
 	##
 	## **Node App**
 	##
-
 	## `App` divides the screen into two rows: `Plot_area` and
 	## `KeyPress`.
-
-	##
-	## **Show key presses at the bottom of the screen**
-	##
 
 	##
 	## **Node Plot_area**
 	##
 
-	## `Plot_area` shall expand and fill vertically. Intent is to
+	## Node `Plot_area` shall expand and fill vertically. Intent is to
 	## push `KeyPress` to the screen bottom.
+	##
+	## **Show key presses at the bottom of the screen**
+	##
+
+	## Use `size_flags_vertical`: `SIZE_EXPAND_FILL`
 	Plot_area.size_flags_vertical = SIZE_EXPAND_FILL
 
 	## `Plot_bound` shows the bounds of `Plot_area`.
@@ -134,9 +137,22 @@ func _ready() -> void:
 	## `PlotParts` is a `GridContainer`. Godot determines the
 	## number of rows in the `GridContainer` by dividing the
 	## number of children in `PlotParts` by `PlotParts.columns`.
-
-	# Rows in GridContainer PlotParts is num children / columns 
+	##
 	PlotParts.columns = 3
+
+	## `PlotParts` has 9 children and three columns:
+	##
+	## ```
+	## ┌───┬──────────────┬───┐
+	## │ - │ plot title   │ - │
+	## ├───┼──────────────┼───┤
+	## │   │              │   │
+	## │ y1│    data      │ y2│
+	## │   │              │   │
+	## ├───┼──────────────┼───┤
+	## │ - │   x-axis     │ - │
+	## └───┴──────────────┴───┘
+	## ```
 
 	##
 	## **Children of `PlotParts`**
