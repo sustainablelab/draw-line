@@ -41,6 +41,14 @@ def is_start_of_func_docstring(line:str) -> bool:
     if "\\brief" in line:
         return True
 
+def is_func_docstring_param(line:str) -> bool:
+    if "\\param" in line:
+        return True
+
+def is_func_docstring_return(line:str) -> bool:
+    if "\\return" in line:
+        return True
+
 def is_get_node(line:str) -> bool:
     if "get_node(" in line:
         return True
@@ -57,6 +65,7 @@ def get_toc(code_filepath: pathlib.Path) -> list:
                 link = name.lower().replace(" ","-")
                 level1 = f"- [{text}](Main.md#{link})"
                 toc.append(level1)
+    toc.append("- [Class Summaries](Main.md#class-summaries)")
     return toc
 
 # TODO: gotta rename this to show it is more than section names
@@ -120,15 +129,28 @@ def get_section_names(code_filepath: pathlib.Path) -> list:
                 elif is_doc_comment(line): # doc comments start with ##
                     if part_of_func_docstring:
                         if line.strip() != "##":
-                            line_as_docstring = "*" + line.strip("## ").strip() + "*"
-                            # line_as_docstring = f"> {line.strip('## ').strip()}"
+                            if is_func_docstring_param(line):
+                                # line_as_docstring = "*" + line.strip("## ").strip("\\param").strip() + "*\n>"
+                                line_as_docstring = line.strip("## ").strip("\\param").strip()
+                                assert len(line_as_docstring.split(":"))==2
+                                param = line_as_docstring.split(":")[0]
+                                descr = line_as_docstring.split(":")[1]
+                                line_as_docstring = f"**{param}:** {descr}\n>"
+                            elif is_func_docstring_return(line):
+                                line_as_docstring = "**Return:**\n>\n>    *" + line.strip("## ").strip("\\return").strip() + "*\n>"
+                            else:
+                                line_as_docstring = "*" + line.strip("## ").strip() + "*"
+                                # line_as_docstring = f"> {line.strip('## ').strip()}"
                             section_names.append(f"> {line_as_docstring}")
                         else:
                             section_names.append(f">")
                     else:
                         line = line.lstrip()
                         if line != "##":
-                            line_as_plain_text = line.strip("##").strip()
+                            # line_as_plain_text = line.strip("##").strip()
+                            line_as_plain_text = line.strip("##")
+                            if not line_as_plain_text.strip().startswith("-"):
+                                line_as_plain_text = line_as_plain_text.strip()
                         else:
                             # Do not strip newline if doc comment is blank.
                             line_as_plain_text = line.strip("##")
@@ -222,7 +244,11 @@ All drawing happens in the `_process()` callback on line
 """
 
 def create_class_summary(code_filepath: pathlib.Path) -> str:
-    return f"""bob
+    return f"""
+## {code_filepath.stem}
+
+- TODO: write `create_class_summary()` in `summarize-my-code.py`
+
 """
 
 def collect_globals(code_filepath: pathlib.Path) -> str:
@@ -347,6 +373,9 @@ if __name__ == '__main__':
         # --------------------------------------------------
         # TODO: figure these script names out from the file
         # summary!
-        my_class_code = src.joinpath("PlotInfo.gd")
-        o.write(create_class_summary(my_class_code))
+        o.write("# Class Summaries\n")
+        for _file,_type in zip(my_code_files, file_types):
+            if _type == "class":
+                my_class_code = src.joinpath(_file)
+                o.write(create_class_summary(my_class_code))
 
